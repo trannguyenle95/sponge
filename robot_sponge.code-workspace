@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../deformable_object_grasping"
+		}
+	],
+	"settings": {}
+}
