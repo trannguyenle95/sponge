@@ -39,6 +39,7 @@ from isaacgym import gymutil
 import open3d
 import torch
 from utils import sim_utils
+from utils import spongefsm
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 # Set target indenter pose
@@ -81,13 +82,12 @@ def main():
     # indenter_names = ['sphere_3-5mm', 'sphere_7mm', 'sphere_14mm', 
     #                   'cylinder_short_3-5mm', 'cylinder_short_7mm', 'cylinder_long_7mm', 
     #                   'cube_14mm', 'ring_7mm']
-    indenter_names = ['plate_ycb']
+    indenter_names = ['bowl_ycb','plate_ycb']
     asset_handles_indenters = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'indenters'),
                                           objects=indenter_names,
                                           options=asset_options)
-
     # Define and create scene
     scene_props = set_scene_props(num_envs=len(indenter_names))
     env_handles, actor_handles_biotacs, actor_handles_indenters = create_scene(gym=gym, 
@@ -98,37 +98,82 @@ def main():
     viewer, axes_geom = create_viewer(gym=gym, 
                                       sim=sim)
     # Setup cameras
-    cam_handles = []
-    cam_width = 300
-    cam_height = 300 
-    cam_positions = gymapi.Vec3(0.0, 0.22, 0.001) #x ngang, y cao, z nhin xa
-    cam_targets = gymapi.Vec3(0.0, 0.0, 0.0)
-    cam_handles, cam_props = sim_utils.setup_cam(gym, env_handles[0], cam_width, cam_height, cam_positions, cam_targets)
-
+    cam_handles,cam_props = sim_utils.setup_cam(gym, env_handles, scene_props)
     # Define controller for indenters
     # set_ctrl_props(gym=gym,
     #                envs=env_handles,
     #                indenters=actor_handles_biotacs)    
     # Run simulation loop
-    results = run_sim_loop(gym=gym, 
-                        sim=sim, 
-                        envs=env_handles, 
-                        cam_handles=cam_handles,
-                        cam_props = cam_props,
-                        indenters=actor_handles_biotacs,
-                        viewer=viewer,
-                        axes=axes_geom,
-                        indent_target=INDENT_TARGET,
-                        indent_dist=args.indent_dist,
-                        indent_steps=args.indent_steps,
-                        err_tol=args.err_tol,
-                        extract_stress=args.extract_stress)
+    state = 'init'
+    sponge_fsms = []
+    for i in range(len(env_handles)):
+        sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
+                            sim=sim, 
+                            envs=env_handles, 
+                            env_id = i,
+                            cam_handles=cam_handles[i],
+                            cam_props = cam_props[i],
+                            sponge_actor=actor_handles_biotacs,
+                            viewer=viewer,
+                            axes=axes_geom,
+                            state=state)
+        sponge_fsms.append(sponge_fsm)
+    # results = run_sim_loop(gym=gym, 
+    #                     sim=sim, 
+    #                     envs=env_handles, 
+    #                     cam_handles=cam_handles,
+    #                     cam_props = cam_props,
+    #                     indenters=actor_handles_biotacs,
+    #                     viewer=viewer,
+    #                     axes=axes_geom,
+    #                     extract_stress=args.extract_stress)
 
     # Export results to HDF
-    if args.export_results:
-        export_results(results, path='results.hdf5')
+    # if args.export_results:
+    #     export_results(results, path='results.hdf5')
+        # Make updating plot
+    all_done = False
+    use_viewer = True
+    count = 0 
+    while not all_done:
+        if use_viewer:
+            pass
 
-def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset=0.25, indenter_offset=0.01785938):
+        # for i in range(len(env_handles)):
+        #     sponge_fsms[i].update_previous_particle_state_tensor()
+        for i in range(len(env_handles)):
+            if sponge_fsms[i].state == 'done':
+                count += 1
+        all_done = all(sponge_fsms[i].state == 'done'
+                       for i in range(len(env_handles)))
+        
+        gym.refresh_particle_state_tensor(sim)
+        for i in range(len(env_handles)):
+            if sponge_fsms[i].state != "done":
+                sponge_fsms[i].run_state_machine()
+            print("State env ", str(i), "---- state: ",sponge_fsms[i].state)
+        # Run simulation
+        gym.simulate(sim)
+        gym.fetch_results(sim, True)
+        # Visualize motion and deformation
+        gym.step_graphics(sim)
+        gym.draw_viewer(viewer, sim, True)
+        gym.sync_frame_time(sim)
+        gym.clear_lines(viewer)
+
+        gym.step_graphics(sim)
+        # render the camera sensors
+
+        if use_viewer:
+            gym.draw_viewer(viewer, sim, True)
+    # Clean up
+    if use_viewer:
+        gym.destroy_viewer(viewer)
+    gym.destroy_sim(sim)
+
+    print("Finished the simulation")
+
+def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.01785938):
     """Create a scene (i.e., ground plane, environments, BioTac actors, and indenter actors)."""
 
     plane_params = gymapi.PlaneParams()
@@ -145,7 +190,7 @@ def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset
         collision_group = i
         collision_filter = 0
 
-        pose.p = gymapi.Vec3(0.0 + 0*0.05, biotac_offset, 0.0)
+        pose.p = gymapi.Vec3(0.0+i*0.05, biotac_offset, 0.0)
         r = R.from_euler('XYZ', [0, 0, 0], degrees=True)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
@@ -198,14 +243,14 @@ def create_viewer(gym, sim):
     """Create viewer and axes objects."""
 
     camera_props = gymapi.CameraProperties()
-    camera_props.horizontal_fov = 5.0
+    # camera_props.horizontal_fov = 5.0
     camera_props.width = 1920
     camera_props.height = 1080
     viewer = gym.create_viewer(sim, camera_props)
-    camera_pos = gymapi.Vec3(0.075, 2.0, 4.0)
-    camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
-    # camera_pos= gymapi.Vec3(0.0, 0.2, 0.001) #x ngang, y cao, z nhin xa
-    # camera_target = gymapi.Vec3(0.0, 0.00, 0.0)
+    # camera_pos = gymapi.Vec3(0.075, 3.0, 4.0)
+    # camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
+    camera_pos= gymapi.Vec3(0.05, 0.18, 0.001) #x ngang, y cao, z nhin xa
+    camera_target = gymapi.Vec3(0.05, 0.00, 0.0)
     gym.viewer_camera_look_at(viewer, None, camera_pos, camera_target)
 
     axes_geom = gymutil.AxesGeometry(0.1)
@@ -273,21 +318,21 @@ def extract_elem_stresses(gym, sim, envs):
     
     return stresses_von_mises
 
-def extract_net_forces(gym, sim):
-    """Extract the net force vector on the BioTac for each environment."""
+# def extract_net_forces(gym, sim):
+#     """Extract the net force vector on the BioTac for each environment."""
 
-    contacts = gym.get_soft_contacts(sim)
-    num_envs = gym.get_env_count(sim)
-    net_force_vecs = np.zeros((num_envs, 3))
-    for contact in contacts:
-        rigid_body_index = contact[4]
-        contact_normal = np.array([*contact[6]])
-        contact_force_mag = contact[7]
-        env_index = rigid_body_index // 3
-        force_vec = contact_force_mag * contact_normal
-        net_force_vecs[env_index] += force_vec
-    net_force_vecs = -net_force_vecs
-    return net_force_vecs
+#     contacts = gym.get_soft_contacts(sim)
+#     num_envs = gym.get_env_count(sim)
+#     net_force_vecs = np.zeros((num_envs, 3))
+#     for contact in contacts:
+#         rigid_body_index = contact[4]
+#         contact_normal = np.array([*contact[6]])
+#         contact_force_mag = contact[7]
+#         env_index = rigid_body_index // 3
+#         force_vec = contact_force_mag * contact_normal
+#         net_force_vecs[env_index] += force_vec
+#     net_force_vecs = -net_force_vecs
+#     return net_force_vecs
 
 def extract_nodal_coords(gym, sim, particle_states):
     """Extract the nodal coordinates for the BioTac from each environment."""
@@ -356,239 +401,239 @@ def reset_indenter_state(gym, envs, indenters, indent_target, indent_dist):
 
         indenter_index += 1
 
-def run_sim_loop(gym, sim, envs, cam_handles, cam_props, indenters, viewer, axes, indent_target, indent_dist, indent_steps, err_tol, extract_stress, draw_pose=False, show_contacts=False):
-    """Run the simulation and visualization loop."""
+# def run_sim_loop(gym, sim, envs, cam_handles, cam_props, indenters, viewer, axes, extract_stress, draw_pose=False, show_contacts=False):
+#     """Run the simulation and visualization loop."""
 
-    results = []
+#     results = []
     
-    # Get particle state tensor and convert to PyTorch tensor
-    particle_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
-    gym.refresh_particle_state_tensor(sim)
-    biotac_state_init = copy.deepcopy(particle_state_tensor)
+#     # Get particle state tensor and convert to PyTorch tensor
+#     particle_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
+#     gym.refresh_particle_state_tensor(sim)
+#     biotac_state_init = copy.deepcopy(particle_state_tensor)
     
-    biotac_state_init_array = particle_state_tensor.numpy()[:, :3].astype('float32')  
-    pcd = open3d.geometry.PointCloud()
-    pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_init_array))
-    open3d.io.write_point_cloud("/home/trannguyenle/test.pcd", pcd)
-    # # Set initial indenter state and control target for initial indentation increment
-    # reset_indenter_state(gym=gym,
-    #                      envs=envs,
-    #                      indenters=indenters,
-    #                      indent_target=indent_target,
-    #                      indent_dist=indent_dist)
+#     biotac_state_init_array = particle_state_tensor.numpy()[:, :3].astype('float32')  
+#     pcd = open3d.geometry.PointCloud()
+#     pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_init_array))
+#     open3d.io.write_point_cloud("/home/trannguyenle/test.pcd", pcd)
+#     # # Set initial indenter state and control target for initial indentation increment
+#     # reset_indenter_state(gym=gym,
+#     #                      envs=envs,
+#     #                      indenters=indenters,
+#     #                      indent_target=indent_target,
+#     #                      indent_dist=indent_dist)
 
-    ctrl_target = 0.0
-    # ctrl_target = set_ctrl_target(gym=gym,
-    #                               envs=envs,
-    #                               indenters=indenters,
-    #                               ctrl_target=ctrl_target,
-    #                               indent_dist=indent_dist,
-    #                               indent_steps=indent_steps)
+#     # ctrl_target = 0.0
+#     # ctrl_target = set_ctrl_target(gym=gym,
+#     #                               envs=envs,
+#     #                               indenters=indenters,
+#     #                               ctrl_target=ctrl_target,
+#     #                               indent_dist=indent_dist,
+#     #                               indent_steps=indent_steps)
 
-    num_envs = len(envs)
-    indent_inc_flags = np.zeros(num_envs)
-    indent_dist_flags = np.zeros(num_envs)
-    state = "capture_target_pc"
-    moving_average = []
-    F_history = []
-    filtered_forces =[]
-    F_max_window_size = 300
-    torque_des = [0, -0.1, -0.1]
-    while not gym.query_viewer_has_closed(viewer):
+#     num_envs = len(envs)
+#     indent_inc_flags = np.zeros(num_envs)
+#     indent_dist_flags = np.zeros(num_envs)
+#     state = "capture_target_pc"
+#     moving_average = []
+#     F_history = []
+#     filtered_forces =[]
+#     F_max_window_size = 300
+#     torque_des = [0, -0.1, -0.1]
+#     while not gym.query_viewer_has_closed(viewer):
 
-        # Run simulation
-        gym.simulate(sim)
-        gym.fetch_results(sim, True)
+#         # Run simulation
+#         gym.simulate(sim)
+#         gym.fetch_results(sim, True)
 
-        # Visualize motion and deformation
-        gym.step_graphics(sim)
-        gym.draw_viewer(viewer, sim, True)
-        gym.sync_frame_time(sim)
-        gym.clear_lines(viewer)
+#         # Visualize motion and deformation
+#         gym.step_graphics(sim)
+#         gym.draw_viewer(viewer, sim, True)
+#         gym.sync_frame_time(sim)
+#         gym.clear_lines(viewer)
 
-        if state == "capture_target_pc":
-            allpc_array = sim_utils.get_partial_point_cloud(gym, sim, envs[0], cam_handles, cam_props, visualization=True)
-            allpcd = open3d.geometry.PointCloud()
-            allpcd.points = open3d.utility.Vector3dVector(np.array(allpc_array))
-            state = "approach"
-        elif state == "approach":
-            print("approaching")
-            for env, indenter in zip(envs, indenters):
-                indenter_dof_state = gym.get_actor_dof_states(env, indenter, gymapi.STATE_ALL)
-                indenter_dof_pos = indenter_dof_state['pos']
-                F_curr = extract_net_forces(gym,sim)  
-                print("F_curr: ",F_curr)
-                if F_curr.all() == 0:
-                    vel_des = -50 
-                    if indenter_dof_pos < -0.2 and indenter_dof_pos > -0.35:
-                        vel_des = -20  
-                    elif indenter_dof_pos < -0.35:
-                        vel_des = -3  
-                    dof_props = gym.get_actor_dof_properties(env, indenter)
-                    dof_props['driveMode'][0] = gymapi.DOF_MODE_VEL
+#         if state == "capture_target_pc":
+#             allpc_array = sim_utils.get_partial_point_cloud(gym, sim, envs[0], cam_handles, cam_props, visualization=True)
+#             allpcd = open3d.geometry.PointCloud()
+#             allpcd.points = open3d.utility.Vector3dVector(np.array(allpc_array))
+#             state = "approach"
+#         elif state == "approach":
+#             print("approaching")
+#             for env, indenter in zip(envs, indenters):
+#                 indenter_dof_state = gym.get_actor_dof_states(env, indenter, gymapi.STATE_ALL)
+#                 indenter_dof_pos = indenter_dof_state['pos']
+#                 F_curr = extract_net_forces(gym,sim)  
+#                 print("F_curr: ",F_curr)
+#                 if F_curr.all() == 0:
+#                     vel_des = -50 
+#                     if indenter_dof_pos < -0.2 and indenter_dof_pos > -0.35:
+#                         vel_des = -20  
+#                     elif indenter_dof_pos < -0.35:
+#                         vel_des = -3  
+#                     dof_props = gym.get_actor_dof_properties(env, indenter)
+#                     dof_props['driveMode'][0] = gymapi.DOF_MODE_VEL
 
-                    gym.set_actor_dof_properties(env,
-                                                                indenter,
-                                                                dof_props)
+#                     gym.set_actor_dof_properties(env,
+#                                                                 indenter,
+#                                                                 dof_props)
 
-                    gym.set_actor_dof_velocity_targets(env,
-                                                            indenter,
-                                                            vel_des)
+#                     gym.set_actor_dof_velocity_targets(env,
+#                                                             indenter,
+#                                                             vel_des)
                     
-                elif F_curr.any() != 0:
-                    state = "press"
+#                 elif F_curr.any() != 0:
+#                     state = "press"
             
 
-            # Draw indenter pose and visualize contacts
-            # for env, indenter in zip(envs, indenters):
-            #     if draw_pose:
-            #         get_pose_and_draw(gym, env, viewer, axes, indenter)
-            #     if show_contacts:
-            #         gym.draw_env_rigid_contacts(viewer, env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
-            #         gym.draw_env_soft_contacts(viewer, env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
+#             # Draw indenter pose and visualize contacts
+#             # for env, indenter in zip(envs, indenters):
+#             #     if draw_pose:
+#             #         get_pose_and_draw(gym, env, viewer, axes, indenter)
+#             #     if show_contacts:
+#             #         gym.draw_env_rigid_contacts(viewer, env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
+#             #         gym.draw_env_soft_contacts(viewer, env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
             
-        elif state == "press":
-            print("pressing")
-            # =================================================
-            # Process finger grasp forces with LP filter and moving average
-            F_curr = extract_net_forces(gym,sim)  
-            print("F_curr:",F_curr)  
-            F_history.append(np.sum(F_curr[1:]))
-            window = F_history[-F_max_window_size:]
-            filtered_force, avg_of_filter = 0.0, 0.0
-            if len(window) > 10:
-                filtered_force = sim_utils.butter_lowpass_filter(window)[-1]
-            filtered_forces.append(filtered_force)
-            if len(F_history) > 0:
-                avg_of_filter = np.mean(filtered_forces[-30:])
-            moving_average.append(avg_of_filter)
+#         elif state == "press":
+#             print("pressing")
+#             # =================================================
+#             # Process finger grasp forces with LP filter and moving average
+#             F_curr = extract_net_forces(gym,sim)  
+#             print("F_curr:",F_curr)  
+#             F_history.append(np.sum(F_curr[1:]))
+#             window = F_history[-F_max_window_size:]
+#             filtered_force, avg_of_filter = 0.0, 0.0
+#             if len(window) > 10:
+#                 filtered_force = sim_utils.butter_lowpass_filter(window)[-1]
+#             filtered_forces.append(filtered_force)
+#             if len(F_history) > 0:
+#                 avg_of_filter = np.mean(filtered_forces[-30:])
+#             moving_average.append(avg_of_filter)
 
-            F_des = np.array(
-                [0.0, 1000.0, 0.0])
-            torque_des_force, F_curr_mag, F_err = sim_utils.get_force_based_torque(F_des, F_curr,moving_average,torque_des)
-            F_des = np.asarray(F_des, dtype=np.float32)
-            # Change mode of the fingers to torque control
-            for env, indenter in zip(envs, indenters):
-                dof_props = gym.get_actor_dof_properties(env, indenter)
-                dof_props['driveMode'][0] = gymapi.DOF_MODE_EFFORT
-                gym.set_actor_dof_properties(env,
-                                                        indenter,
-                                                        dof_props)
-                print(torque_des_force)
-                gym.apply_dof_effort(env,
-                                                        indenter,
-                                                        torque_des_force[1])
-                print("asd:",np.abs(np.abs(torque_des_force[1])-np.abs(F_des[1])))
-                if  np.abs(np.abs(torque_des_force[1])-np.abs(F_des[1])) < np.abs(0.001 * F_des[1]):
-                    state = "done"
-        elif state == "done":
-            print("done")
-            particle_deformed_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
-            print(particle_deformed_state_tensor)
+#             F_des = np.array(
+#                 [0.0, 1000.0, 0.0])
+#             torque_des_force, F_curr_mag, F_err = sim_utils.get_force_based_torque(F_des, F_curr,moving_average,torque_des)
+#             F_des = np.asarray(F_des, dtype=np.float32)
+#             # Change mode of the fingers to torque control
+#             for env, indenter in zip(envs, indenters):
+#                 dof_props = gym.get_actor_dof_properties(env, indenter)
+#                 dof_props['driveMode'][0] = gymapi.DOF_MODE_EFFORT
+#                 gym.set_actor_dof_properties(env,
+#                                                         indenter,
+#                                                         dof_props)
+#                 print(torque_des_force)
+#                 gym.apply_dof_effort(env,
+#                                                         indenter,
+#                                                         torque_des_force[1])
+#                 print("asd:",np.abs(np.abs(torque_des_force[1])-np.abs(F_des[1])))
+#                 if  np.abs(np.abs(torque_des_force[1])-np.abs(F_des[1])) < np.abs(0.001 * F_des[1]):
+#                     state = "done"
+#         elif state == "done":
+#             print("done")
+#             particle_deformed_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
+#             print(particle_deformed_state_tensor)
 
-            gym.refresh_particle_state_tensor(sim)
-            biotac_deformed_state_init = copy.deepcopy(particle_deformed_state_tensor)
-            biotac_state_deformed_array = biotac_deformed_state_init.numpy()[:, :3].astype('float32')  
-            pcd = open3d.geometry.PointCloud()
-            pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_deformed_array))
-            sim_utils.visualize_pc_open3d(pcd)
-            break
-            # =================================================
+#             gym.refresh_particle_state_tensor(sim)
+#             biotac_deformed_state_init = copy.deepcopy(particle_deformed_state_tensor)
+#             biotac_state_deformed_array = biotac_deformed_state_init.numpy()[:, :3].astype('float32')  
+#             pcd = open3d.geometry.PointCloud()
+#             pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_deformed_array))
+#             sim_utils.visualize_pc_open3d(pcd)
+#             break
+#             # =================================================
 
-            # # Set indentation flags
-            # env_index = 0
-            # for env, indenter in zip(envs, indenters):
-            #     indenter_dof_state = gym.get_actor_dof_states(env, indenter, gymapi.STATE_ALL)
-            #     indenter_dof_pos = indenter_dof_state['pos']
-            #     # If indenter joint position exceeds specified indentation increment, set flag
-            #     if abs(ctrl_target - indenter_dof_pos) < 1:
-            #         indent_inc_flags[env_index] = 1
-            #     # If indenter joint position exceeds full indentation indentation distance, set flag
-            #     if abs(indent_dist + indenter_dof_pos) < err_tol:
-            #         indent_dist_flags[env_index] = 1
-            #     env_index += 1
+#             # # Set indentation flags
+#             # env_index = 0
+#             # for env, indenter in zip(envs, indenters):
+#             #     indenter_dof_state = gym.get_actor_dof_states(env, indenter, gymapi.STATE_ALL)
+#             #     indenter_dof_pos = indenter_dof_state['pos']
+#             #     # If indenter joint position exceeds specified indentation increment, set flag
+#             #     if abs(ctrl_target - indenter_dof_pos) < 1:
+#             #         indent_inc_flags[env_index] = 1
+#             #     # If indenter joint position exceeds full indentation indentation distance, set flag
+#             #     if abs(indent_dist + indenter_dof_pos) < err_tol:
+#             #         indent_dist_flags[env_index] = 1
+#             #     env_index += 1
 
-            # # If all indenter joint positions have exceeded indentation increment targets, 
-            # # extract results and set new target
-            # if np.all(indent_inc_flags):
-            #     indent_inc_flags = np.zeros(num_envs)
-            #     results_curr_inc = extract_results(gym=gym,
-            #                                     sim=sim,
-            #                                     envs=envs,
-            #                                     particle_states=particle_state_tensor,
-            #                                     extract_stress=extract_stress)
-            #     results.append(results_curr_inc)
-            #     ctrl_target = set_ctrl_target(gym=gym,
-            #                                 envs=envs,
-            #                                 indenters=indenters,
-            #                                 ctrl_target=ctrl_target,
-            #                                 indent_dist=indent_dist,
-            #                                 indent_steps=indent_steps)
+#             # # If all indenter joint positions have exceeded indentation increment targets, 
+#             # # extract results and set new target
+#             # if np.all(indent_inc_flags):
+#             #     indent_inc_flags = np.zeros(num_envs)
+#             #     results_curr_inc = extract_results(gym=gym,
+#             #                                     sim=sim,
+#             #                                     envs=envs,
+#             #                                     particle_states=particle_state_tensor,
+#             #                                     extract_stress=extract_stress)
+#             #     results.append(results_curr_inc)
+#             #     ctrl_target = set_ctrl_target(gym=gym,
+#             #                                 envs=envs,
+#             #                                 indenters=indenters,
+#             #                                 ctrl_target=ctrl_target,
+#             #                                 indent_dist=indent_dist,
+#             #                                 indent_steps=indent_steps)
 
-            # # If all indenter joint positions have exceeded full indentation distance, 
-            # # reset BioTac and indenter states and target
-            # if np.all(indent_dist_flags):
-            #     indent_dist_flags = np.zeros(num_envs)
-
-
-            #     particle_deformed_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
-            #     print(particle_deformed_state_tensor)
-
-            #     gym.refresh_particle_state_tensor(sim)
-            #     biotac_deformed_state_init = copy.deepcopy(particle_deformed_state_tensor)
-            #     biotac_state_deformed_array = biotac_deformed_state_init.numpy()[:, :3].astype('float32')  
-            #     pcd = open3d.geometry.PointCloud()
-            #     pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_deformed_array))
-            #     open3d.io.write_point_cloud("/home/trannguyenle/new.pcd", pcd)
+#             # # If all indenter joint positions have exceeded full indentation distance, 
+#             # # reset BioTac and indenter states and target
+#             # if np.all(indent_dist_flags):
+#             #     indent_dist_flags = np.zeros(num_envs)
 
 
+#             #     particle_deformed_state_tensor = gymtorch.wrap_tensor(gym.acquire_particle_state_tensor(sim))
+#             #     print(particle_deformed_state_tensor)
 
-                # fit to unit cube
-                # allpcd.scale(1 / np.max(allpcd.get_max_bound() - allpcd.get_min_bound()),
-                #         center=allpcd.get_center())
-                # allpcd.colors = open3d.utility.Vector3dVector(np.random.uniform(0, 1, size=(4000, 3)))
-                # open3d.visualization.draw_geometries([allpcd])
+#             #     gym.refresh_particle_state_tensor(sim)
+#             #     biotac_deformed_state_init = copy.deepcopy(particle_deformed_state_tensor)
+#             #     biotac_state_deformed_array = biotac_deformed_state_init.numpy()[:, :3].astype('float32')  
+#             #     pcd = open3d.geometry.PointCloud()
+#             #     pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_deformed_array))
+#             #     open3d.io.write_point_cloud("/home/trannguyenle/new.pcd", pcd)
 
-                # print('voxelization')
-                # voxel_grid = open3d.geometry.VoxelGrid.create_from_point_cloud(allpcd,
-                #                                                     voxel_size=0.02)
-                # voxels = voxel_grid.get_voxels()
-                # print(voxels)
-                # sim_utils.visualize_pc_open3d(voxel_grid)
 
-                # objectandsponge_pc = open3d.geometry.PointCloud()
-                # objectandsponge_pc = pcd
-                # sim_utils.visualize_pc_open3d(objectandsponge_pc)
-                # # reset_biotac_state(gym=gym,
-                # #                 sim=sim,
-                # #                 biotac_state=biotac_state_init)
-                # reset_indenter_state(gym=gym,
-                #                     envs=envs,
-                #                     indenters=indenters,
-                #                     indent_target=indent_target,
-                #                     indent_dist=indent_dist)
-                # ctrl_target = 0.0
-                # ctrl_target = set_ctrl_target(gym=gym,
-                #                             envs=envs,
-                #                             indenters=indenters,
-                #                             ctrl_target=ctrl_target,
-                #                             indent_dist=indent_dist,
-                #                             indent_steps=indent_steps)
-                # break
 
-    # Simulate and visualize one final step
-    gym.simulate(sim)
-    gym.fetch_results(sim, True)
-    gym.step_graphics(sim)
-    gym.draw_viewer(viewer, sim, True)
-    gym.sync_frame_time(sim)
-    gym.clear_lines(viewer)
+#                 # fit to unit cube
+#                 # allpcd.scale(1 / np.max(allpcd.get_max_bound() - allpcd.get_min_bound()),
+#                 #         center=allpcd.get_center())
+#                 # allpcd.colors = open3d.utility.Vector3dVector(np.random.uniform(0, 1, size=(4000, 3)))
+#                 # open3d.visualization.draw_geometries([allpcd])
 
-    # Clean up
-    gym.destroy_viewer(viewer)
-    gym.destroy_sim(sim)
+#                 # print('voxelization')
+#                 # voxel_grid = open3d.geometry.VoxelGrid.create_from_point_cloud(allpcd,
+#                 #                                                     voxel_size=0.02)
+#                 # voxels = voxel_grid.get_voxels()
+#                 # print(voxels)
+#                 # sim_utils.visualize_pc_open3d(voxel_grid)
 
-    return results
+#                 # objectandsponge_pc = open3d.geometry.PointCloud()
+#                 # objectandsponge_pc = pcd
+#                 # sim_utils.visualize_pc_open3d(objectandsponge_pc)
+#                 # # reset_biotac_state(gym=gym,
+#                 # #                 sim=sim,
+#                 # #                 biotac_state=biotac_state_init)
+#                 # reset_indenter_state(gym=gym,
+#                 #                     envs=envs,
+#                 #                     indenters=indenters,
+#                 #                     indent_target=indent_target,
+#                 #                     indent_dist=indent_dist)
+#                 # ctrl_target = 0.0
+#                 # ctrl_target = set_ctrl_target(gym=gym,
+#                 #                             envs=envs,
+#                 #                             indenters=indenters,
+#                 #                             ctrl_target=ctrl_target,
+#                 #                             indent_dist=indent_dist,
+#                 #                             indent_steps=indent_steps)
+#                 # break
+
+#     # Simulate and visualize one final step
+#     gym.simulate(sim)
+#     gym.fetch_results(sim, True)
+#     gym.step_graphics(sim)
+#     gym.draw_viewer(viewer, sim, True)
+#     gym.sync_frame_time(sim)
+#     gym.clear_lines(viewer)
+
+#     # Clean up
+#     gym.destroy_viewer(viewer)
+#     gym.destroy_sim(sim)
+
+#     return results
 
 def set_asset_options():
     """Set asset options common to all assets."""
@@ -620,28 +665,29 @@ def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio):
             else:
                 print(line, end='')
 
-# def set_ctrl_props(gym, envs, indenters, pd_gains=[1.0e9, 1.0]):
-#     """Set the properties for the indenter PD controllers."""
+# # def set_ctrl_props(gym, envs, indenters, pd_gains=[1.0e9, 1.0]):
+# #     """Set the properties for the indenter PD controllers."""
 
-#     for env, indenter in zip(envs, indenters):
-#         indenter_dof_props = gym.get_actor_dof_properties(env, indenter)
-#         print("test: ",indenter_dof_props['driveMode'])
-#         indenter_dof_props['driveMode'][0] = gymapi.DOF_MODE_POS
-#         indenter_dof_props['stiffness'][0] = pd_gains[0]
-#         indenter_dof_props['damping'][0] = pd_gains[1]
-#         gym.set_actor_dof_properties(env, indenter, indenter_dof_props)
+# #     for env, indenter in zip(envs, indenters):
+# #         indenter_dof_props = gym.get_actor_dof_properties(env, indenter)
+# #         print("test: ",indenter_dof_props['driveMode'])
+# #         indenter_dof_props['driveMode'][0] = gymapi.DOF_MODE_POS
+# #         indenter_dof_props['stiffness'][0] = pd_gains[0]
+# #         indenter_dof_props['damping'][0] = pd_gains[1]
+# #         gym.set_actor_dof_properties(env, indenter, indenter_dof_props)
 
-# def set_ctrl_target(gym, envs, indenters, ctrl_target, indent_dist, indent_steps):
-#     """Set the controller targets for the next indentation increment."""
-#     ctrl_target -= indent_dist / indent_steps
-#     for env, indenter in zip(envs, indenters):
-#         gym.set_actor_dof_position_targets(env, indenter, np.array([ctrl_target], dtype=np.float32))
-#     return ctrl_target
+# # def set_ctrl_target(gym, envs, indenters, ctrl_target, indent_dist, indent_steps):
+# #     """Set the controller targets for the next indentation increment."""
+# #     ctrl_target -= indent_dist / indent_steps
+# #     for env, indenter in zip(envs, indenters):
+# #         gym.set_actor_dof_position_targets(env, indenter, np.array([ctrl_target], dtype=np.float32))
+# #     return ctrl_target
 
 def set_scene_props(num_envs, env_dim=0.25):
     """Set the scene and environment properties."""
 
-    envs_per_row = int(np.ceil(np.sqrt(num_envs)))
+    # envs_per_row = int(np.ceil(np.sqrt(num_envs)))
+    envs_per_row = int(num_envs)
     env_lower = gymapi.Vec3(-env_dim, 0, -env_dim)
     env_upper = gymapi.Vec3(env_dim, env_dim, env_dim)
     scene_props = {'num_envs': num_envs,
