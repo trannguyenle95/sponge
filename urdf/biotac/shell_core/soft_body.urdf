@@ -26,9 +26,10 @@
 	</joint>
 	<link name="arm">
 		<collision>
-			<origin xyz="0 0.25 0" rpy="0 0 0"/>
+			<origin xyz="0 0.26 0" rpy="0 0 0"/>
 			<geometry>
-				<box size="0.005 0.01 0.005"/>
+				<!-- <box size="0.005 0.005 0.005"/> -->
+				<box size="0.02 0.01 0.06"/>
 			</geometry>
 		</collision>
 	</link>
@@ -40,12 +41,12 @@
 	<link name="soft_object">
 		<fem>
             <origin rpy="0.0 0.0 0.0" xyz="0 0.24 0" />
-            <density value="1e3"/>
-			<youngs value="1552230.93"/>
-			<poissons value="0.31645428"/>
-			<damping value="0.0"/>
-			<attachDistance value="70"/>
-			<tetmesh filename="../../../meshes/sponge/sponge_white.tet"/>
+            <density value="100"/>
+			<youngs value="1000"/>
+			<poissons value="0.45"/>
+			<damping value="0"/>
+			<attachDistance value="0.1"/>
+			<tetmesh filename="../../../meshes/sponge/sponge_more_node.tet"/>
         </fem>
 	</link>
 </robot>

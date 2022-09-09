@@ -8,6 +8,7 @@ import open3d
 from scipy.signal import butter, filtfilt
 import sys
 
+# ==================== VISUAL PROCESSING UTILS ====================================
 def setup_cam(gym, envs, props):
     cam_prop = gymapi.CameraProperties()
     cam_prop.width = 300
@@ -105,14 +106,14 @@ def get_force_based_torque(F_des, F_curr,moving_average,torque_des):
 
         # Kp = self.cfg['force_control']['Kp']
         # min_torque = self.cfg['force_control']['min_torque']
-        Kp =  1.5
-        min_torque = -5
-        torque_des[0] -= min(total_F_err * Kp, 3 * Kp)
-        torque_des[0] = min(min_torque, torque_des[0])
+        Kp =  0.5
+        min_torque = -0.005
+        # torque_des[0] -= min(total_F_err * Kp, 3 * Kp)
+        # torque_des[0] = min(min_torque, torque_des[0])
         torque_des[1] -= min(total_F_err * Kp, 3 * Kp)
         torque_des[1] = min(min_torque, torque_des[1])
-        torque_des[2] -= min(total_F_err * Kp, 3 * Kp)
-        torque_des[2] = min(min_torque, torque_des[2])
+        # torque_des[2] -= min(total_F_err * Kp, 3 * Kp)
+        # torque_des[2] = min(min_torque, torque_des[2])
         return torque_des, F_curr_mag, total_F_err
 
 def butter_lowpass_filter(data):

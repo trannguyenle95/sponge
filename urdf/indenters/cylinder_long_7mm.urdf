@@ -1,5 +1,5 @@
 <robot name="indenter">
-	<link name="world">
+	<!-- <link name="world">
         </link>
 
         <joint name="world_to_indenter" type="prismatic">
@@ -9,7 +9,7 @@
                 <axis xyz="0 1 0"/>
                 <dynamics damping="0.0" friction="0.0"/>
                 <limit lower="0.0" upper="0.1" velocity="1e9" effort="1e9"/>
-        </joint>
+        </joint> -->
 
 	<link name="indenter">
 		<visual>

@@ -50,9 +50,10 @@ INDENT_TARGET = [0.075, 0.25, 0.0,   # Position of tip
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--elast_mod', default=1.55223093e+06, type=float, help="Elastic modulus of BioTac [Pa]")
-    parser.add_argument('--poiss_ratio', default=3.16454280e-01, type=float, help="Poisson's ratio of BioTac")
-    parser.add_argument('--frict_coeff', default=7.83414394e-01, type=float, help='Coefficient of friction between BioTac and indenter')
+    parser.add_argument('--density', default=100, type=float, help="Density")
+    parser.add_argument('--elast_mod', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
+    parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of BioTac")
+    parser.add_argument('--frict_coeff', default=5, type=float, help='Coefficient of friction between BioTac and indenter')
     parser.add_argument('--indent_dist', default=0.45, type=float, help='Initial distance of indenter [m] from target point on BioTac')
     parser.add_argument('--indent_steps', default=200, type=int, help='Number of indentation steps (i.e., spatial increments) over which to collect data')
     parser.add_argument('--err_tol', default=1.0e-3, type=float, help='Maximum acceptable error [m] between target and actual position of indenter')
@@ -73,7 +74,8 @@ def main():
     biotac_urdf_dir = os.path.join('urdf', 'biotac', 'shell_core')
     set_biotac_matl_props(base_dir=biotac_urdf_dir,
                           elast_mod=args.elast_mod,
-                          poiss_ratio=args.poiss_ratio)
+                          poiss_ratio=args.poiss_ratio,
+                          density=args.density)
     asset_handles_biotac = load_assets(gym=gym,
                                        sim=sim,
                                        base_dir=biotac_urdf_dir,
@@ -82,7 +84,8 @@ def main():
     # indenter_names = ['sphere_3-5mm', 'sphere_7mm', 'sphere_14mm', 
     #                   'cylinder_short_3-5mm', 'cylinder_short_7mm', 'cylinder_long_7mm', 
     #                   'cube_14mm', 'ring_7mm']
-    indenter_names = ['bowl_ycb','plate_ycb']
+    indenter_names = ['bowl_ycb']
+    asset_options.thickness = 0.003
     asset_handles_indenters = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'indenters'),
@@ -135,6 +138,7 @@ def main():
     all_done = False
     use_viewer = True
     count = 0 
+    result = []
     while not all_done:
         if use_viewer:
             pass
@@ -152,6 +156,14 @@ def main():
             if sponge_fsms[i].state != "done":
                 sponge_fsms[i].run_state_machine()
             print("State env ", str(i), "---- state: ",sponge_fsms[i].state)
+
+        # results_curr_inc = extract_results(gym=gym,
+        #                                         sim=sim,
+        #                                         envs=envs,
+        #                                         particle_states=particle_state_tensor,
+        #                                         extract_stress=extract_stress)
+
+        # results.append(results_curr_inc)
         # Run simulation
         gym.simulate(sim)
         gym.fetch_results(sim, True)
@@ -172,8 +184,8 @@ def main():
     gym.destroy_sim(sim)
 
     print("Finished the simulation")
-
-def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.01785938):
+# indenter_offset=0.05
+def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.05):
     """Create a scene (i.e., ground plane, environments, BioTac actors, and indenter actors)."""
 
     plane_params = gymapi.PlaneParams()
@@ -190,14 +202,14 @@ def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset
         collision_group = i
         collision_filter = 0
 
-        pose.p = gymapi.Vec3(0.0+i*0.05, biotac_offset, 0.0)
+        pose.p = gymapi.Vec3(0.0+0*0.075, biotac_offset, 0.0)
         r = R.from_euler('XYZ', [0, 0, 0], degrees=True)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
         actor_handle_biotac = gym.create_actor(env_handle, assets_biotac[0], pose, f"biotac_{i}", collision_group, collision_filter)
         actor_handles_biotacs.append(actor_handle_biotac)
 
-        pose.p = gymapi.Vec3(0.0, 0.05, 0.0)
+        pose.p = gymapi.Vec3(0.0, indenter_offset, 0.0)
         r = R.from_euler('XYZ', [0, 0, 0], degrees=True)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
@@ -211,27 +223,28 @@ def create_sim(gym, indent_dist, indent_steps, frict_coeff):
 
     sim_type = gymapi.SIM_FLEX
     sim_params = gymapi.SimParams()
-    sim_params.dt = 1.0e-4  # Control frequency
-    sim_params.substeps = 1  # Physics simulation frequency (multiplier)
+    sim_params.dt = 1./60.  # Control frequency
+    sim_params.substeps = 4  # Physics simulation frequency (multiplier)
     sim_params.gravity = gymapi.Vec3(0.0, 0.0, 0.0)
 
-    sim_params.stress_visualization = True  # von Mises stress
-    sim_params.stress_visualization_min = 1.0e4
-    sim_params.stress_visualization_max = 1.0e5
+    # enable Von-Mises stress visualization
+    # sim_params.stress_visualization = True
+    # sim_params.stress_visualization_min = 0.0
+    # sim_params.stress_visualization_max = 1.e+5
 
     sim_params.flex.solver_type = 5  # PCR (GPU, global)
-    sim_params.flex.num_outer_iterations = 8
-    sim_params.flex.num_inner_iterations = 40
-    sim_params.flex.relaxation = 0.75
-    sim_params.flex.warm_start = 0.8
-    sim_params.flex.deterministic_mode = True
+    sim_params.flex.num_outer_iterations = 4
+    sim_params.flex.num_inner_iterations = 50
+    sim_params.flex.relaxation = 0.7
+    sim_params.flex.warm_start = 0.1
+    sim_params.flex.shape_collision_distance = 5e-4
+    sim_params.flex.contact_regularization = 1.0e-6
+    sim_params.flex.shape_collision_margin = 1.0e-4    
+    sim_params.flex.deterministic_mode = True    
 
-    sim_params.flex.geometric_stiffness = 1.0
-    sim_params.flex.shape_collision_distance = indent_dist / indent_steps  # Distance to be maintained between soft bodies and other bodies or ground plane
-    sim_params.flex.shape_collision_margin = indent_dist / indent_steps * 2  # Distance from rigid bodies at which to begin generating contact constraints
-
-    sim_params.flex.friction_mode = 2  # Friction about all 3 axes (including torsional)
-    sim_params.flex.dynamic_friction = frict_coeff
+    sim_params.flex.friction_mode = 0  # Friction about all 3 axes (including torsional)
+    sim_params.flex.dynamic_friction = 1000
+    sim_params.flex.static_friction = 1000
 
     gpu_physics = 0
     gpu_render = 0
@@ -276,8 +289,8 @@ def extract_results(gym, sim, envs, particle_states, extract_stress):
     """Extract the results from all environments."""
 
     results = {}
-    results['net_force_vecs'] = extract_net_forces(gym=gym, 
-                                                   sim=sim)  # (num_env x 3)
+    # results['net_force_vecs'] = extract_net_forces(gym=gym, 
+    #                                                sim=sim)  # (num_env x 3)
     results['nodal_coords'] = extract_nodal_coords(gym=gym, 
                                                    sim=sim, 
                                                    particle_states=particle_states)  # (num_env x num_nodes x 3)
@@ -641,7 +654,7 @@ def set_asset_options():
     options = gymapi.AssetOptions()
     options.flip_visual_attachments = False
     options.armature = 0.0
-    options.thickness = 0.0
+    options.thickness = 0.0005
     options.linear_damping = 0.0
     options.angular_damping = 0.0
     options.default_dof_drive_mode = gymapi.DOF_MODE_VEL
@@ -649,12 +662,12 @@ def set_asset_options():
 
     return options
 
-def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio):
+def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio,density):
     """Set the BioTac material properties by copying and modifying a URDF template."""
     # TODO: There may be now be a built-in function for setting material properties in the Gym Python API.
 
-    template_path = os.path.join(base_dir, 'biotac_template.urdf')
-    file_path = os.path.join(base_dir, 'biotac.urdf')
+    template_path = os.path.join(base_dir, 'sponge_template.urdf')
+    file_path = os.path.join(base_dir, 'soft_body.urdf')
     copyfile(template_path, file_path)
     with fileinput.FileInput(file_path, inplace=True) as file_obj:
         for line in file_obj:
@@ -662,6 +675,8 @@ def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio):
                 print(line.replace('youngs value=""', f'youngs value="{elast_mod}"'), end='')
             elif 'poissons' in line:
                 print(line.replace('poissons value=""', f'poissons value="{poiss_ratio}"'), end='')
+            elif 'density' in line:
+                print(line.replace('density value=""', f'density value="{density}"'), end='')
             else:
                 print(line, end='')
 

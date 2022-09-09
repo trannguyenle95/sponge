@@ -13,6 +13,7 @@ from isaacgym import gymutil
 import open3d
 import torch
 from utils import sim_utils
+from utils import data_utils
 import numpy as np
 from os.path import exists
 
@@ -66,7 +67,7 @@ class SpongeFsm:
         self.F_max_window_size = 300
         self.torque_des = [0, -0.1, -0.1]
         F_des_raw = np.array(
-                [0.0, 1000.0, 0.0])            
+                [0.0, 30.0, 0.0])            
         self.F_des = np.asarray(F_des_raw, dtype=np.float32)
         self.state = state
 
@@ -75,7 +76,7 @@ class SpongeFsm:
         """Run state machine for running pressing tests."""
         results = []
         allpcs = []
-
+        ctr_pos = 0.0
         target_object_pc_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.env_id)+".pcd"
         if self.state == "init":
             self.started = True
@@ -105,22 +106,25 @@ class SpongeFsm:
             indenter_dof_pos = indenter_dof_state['pos']
             F_curr_all_env = sim_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
+            print(F_curr)
 
             if F_curr.all() == 0:
-                vel_des = -50 
-                if indenter_dof_pos < -0.2 and indenter_dof_pos > -0.35:
-                    vel_des = -20  
-                elif indenter_dof_pos < -0.35:
-                    vel_des = -3  
+                vel_des = -0.3
+                if indenter_dof_pos < -0.3:
+                    vel_des = -0.02  
+
+                print(vel_des)
                 dof_props = self.gym.get_actor_dof_properties(self.env, self.sponge_actor)
                 dof_props['driveMode'][0] = gymapi.DOF_MODE_VEL
 
                 self.gym.set_actor_dof_properties(self.env,self.sponge_actor,dof_props)
 
                 self.gym.set_actor_dof_velocity_targets(self.env,self.sponge_actor,vel_des)
-                
-            elif F_curr.any() != 0:
+            elif F_curr[1] > 2.5:
                 self.state = "press"
+                self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
+                self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
+
         elif self.state == "press":
             # print("pressing")
             # =================================================
@@ -145,18 +149,17 @@ class SpongeFsm:
                                     self.sponge_actor,
                                     self.torque_des_force[1])
             print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])))
-            if  np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])) < np.abs(0.001 * self.F_des[1]):
+            if  np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])) < np.abs(0.05 * self.F_des[1]):
                 self.state = "capture_final_state"
         elif self.state == "capture_final_state":
             particle_deformed_state_tensor = gymtorch.wrap_tensor(self.gym.acquire_particle_state_tensor(self.sim))
             self.gym.refresh_particle_state_tensor(self.sim)
-            biotac_deformed_state_init = copy.deepcopy(particle_deformed_state_tensor)
-            biotac_state_deformed_array_all = biotac_deformed_state_init.numpy()[:, :3].astype('float32')  
-            num_vertices = biotac_state_deformed_array_all.shape[0]/self.num_envs #All vertices divided to number of objects
-            print(num_vertices, "---", int(self.env_id*num_vertices), "----", int((self.env_id+1)*num_vertices+1))
-            biotac_state_deformed_array_env = biotac_state_deformed_array_all[int(self.env_id*num_vertices):int((self.env_id+1)*num_vertices+1),:]
+            self.particle_deformed_state_tensor = data_utils.extract_nodal_coords(gym=self.gym, 
+                                                   sim=self.sim, 
+                                                   particle_states=particle_deformed_state_tensor)  # (num_env x num_nodes x 3)
             pcd = open3d.geometry.PointCloud()
-            pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_deformed_array_env))
+            pcd.points = open3d.utility.Vector3dVector(np.array(self.particle_deformed_state_tensor[self.env_id]))
             sim_utils.visualize_pc_open3d(pcd)
             self.state = "done"                
         return 
+

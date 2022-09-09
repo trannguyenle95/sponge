@@ -21,8 +21,8 @@
 """Convert a .mesh file (fTetWild format) to .tet (IsaacGym format)."""
 
 # Define input and output file names
-mesh_file = open("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/raw_meshes/mesh&tet/sponge_white.mesh", "r")
-tet_output = open("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/raw_meshes/mesh&tet/sponge_white.tet", "w")
+mesh_file = open("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/raw_meshes/mesh&tet/sponge.mesh", "r")
+tet_output = open("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/raw_meshes/mesh&tet/sponge.tet", "w")
 
 # Parse .mesh file
 mesh_lines = list(mesh_file)

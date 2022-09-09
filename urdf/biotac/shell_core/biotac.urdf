@@ -31,8 +31,8 @@
 		<fem>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 			<density value="1e3"/>
-			<youngs value="1552230.93"/>
-			<poissons value="0.31645428"/>
+			<youngs value="15522.3093"/>
+			<poissons value="0.61645428"/>
 			<damping value="0.0"/>
 			<attachDistance value="1.0e-5"/>
 			<tetmesh filename="../../../meshes/biotac/int_ext_skin/int_ext_skin_combined_ftw.tet"/>

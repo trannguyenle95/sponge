@@ -15,13 +15,13 @@
 		<visual>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 			<geometry>
-				<mesh filename="../../meshes/indenters/sphere_14mm.obj"/>
+				<mesh filename="../../meshes/target_objects/plate_ycb_few.obj"/>
 			</geometry>
 		</visual>
 		<collision>
 			<origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
 			<geometry>
-				<mesh filename="../../meshes/indenters/sphere_14mm.obj"/>
+				<mesh filename="../../meshes/target_objects/plate_ycb_few.obj"/>
 			</geometry>
 		</collision>
 		<inertial>

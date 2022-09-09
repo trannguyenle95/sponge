@@ -1,0 +1,52 @@
+<!-- <robot name="biotac">
+    <link name="soft_object">
+        <fem>
+            <origin rpy="0.0 0.0 0.0" xyz="0 0 0" />
+            <density value="1e3"/>
+			<youngs value="1552230.93"/>
+			<poissons value="0.31645428"/>
+			<damping value="0.0"/>
+			<attachDistance value="1e-5"/>
+			<tetmesh filename="../../../meshes/sponge/sponge_white.tet"/>
+        </fem>
+    </link>
+</robot> -->
+
+
+<robot name="biotac">
+	<link name="world"></link>
+	<joint name = "rail" type = "prismatic">
+		<parent link="world"/>
+		<child link="arm"/>
+		<origin xyz="0.0 0.0 0.0"/>
+		<axis xyz="0 1 0"/>
+		<dynamics damping="0.0" friction="0.0"/>
+		<limit lower="-2.0" upper="2.0" velocity="1e9" effort="1e9"/>
+
+	</joint>
+	<link name="arm">
+		<collision>
+			<origin xyz="0 0.26 0" rpy="0 0 0"/>
+			<geometry>
+				<!-- <box size="0.005 0.005 0.005"/> -->
+				<box size="0.02 0.01 0.06"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name = "attach" type = "fixed">
+		<origin xyz = "0.0 0.0 0.0" rpy = "0 0 0"/>
+		<parent link = "arm"/>
+		<child link = "soft_object"/>
+	</joint>
+	<link name="soft_object">
+		<fem>
+            <origin rpy="0.0 0.0 0.0" xyz="0 0.24 0" />
+            <density value=""/>
+			<youngs value=""/>
+			<poissons value=""/>
+			<damping value="0"/>
+			<attachDistance value="0.1"/>
+			<tetmesh filename="../../../meshes/sponge/sponge_more_node.tet"/>
+        </fem>
+	</link>
+</robot>
