@@ -40,7 +40,7 @@
 	</joint>
 	<link name="soft_object">
 		<fem>
-            <origin rpy="0.0 0.0 0.0" xyz="0 0.24 0" />
+            <origin rpy="0.0 0.0 0.0" xyz="0 0.25 0" />
             <density value="100"/>
 			<youngs value="1000"/>
 			<poissons value="0.45"/>

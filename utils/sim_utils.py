@@ -7,7 +7,30 @@ from isaacgym import gymapi
 import open3d
 from scipy.signal import butter, filtfilt
 import sys
+import os
+import copy
+import fileinput
+from shutil import copyfile
 
+# ==================== SIM UTILS ====================================
+
+def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio,density):
+    """Set the BioTac material properties by copying and modifying a URDF template."""
+    # TODO: There may be now be a built-in function for setting material properties in the Gym Python API.
+
+    template_path = os.path.join(base_dir, 'sponge_template.urdf')
+    file_path = os.path.join(base_dir, 'soft_body.urdf')
+    copyfile(template_path, file_path)
+    with fileinput.FileInput(file_path, inplace=True) as file_obj:
+        for line in file_obj:
+            if 'youngs' in line:
+                print(line.replace('youngs value=""', f'youngs value="{elast_mod}"'), end='')
+            elif 'poissons' in line:
+                print(line.replace('poissons value=""', f'poissons value="{poiss_ratio}"'), end='')
+            elif 'density' in line:
+                print(line.replace('density value=""', f'density value="{density}"'), end='')
+            else:
+                print(line, end='')
 # ==================== VISUAL PROCESSING UTILS ====================================
 def setup_cam(gym, envs, props):
     cam_prop = gymapi.CameraProperties()
@@ -73,26 +96,9 @@ def get_partial_point_cloud(gym, sim, env, cam_handles, cam_props, min_z = 0.005
 
         return np.array(points).astype('float32')  
 
-def visualize_pc_open3d(pcds):
-    open3d.visualization.draw_geometries([pcds]) 
+
 
 # ==================== FORCE CONTROL RELATED THINGS====================================
-def extract_net_forces(gym, sim):
-    """Extract the net force vector on the BioTac for each environment."""
-
-    contacts = gym.get_soft_contacts(sim)
-    num_envs = gym.get_env_count(sim)
-    net_force_vecs = np.zeros((num_envs, 3))
-    for contact in contacts:
-        rigid_body_index = contact[4]
-        contact_normal = np.array([*contact[6]])
-        contact_force_mag = contact[7]
-        env_index = rigid_body_index // 3
-        force_vec = contact_force_mag * contact_normal
-        net_force_vecs[env_index] += force_vec
-    net_force_vecs = -net_force_vecs
-    return net_force_vecs
-
 def get_force_based_torque(F_des, F_curr,moving_average,torque_des):
         """Torque-based control with target gripper force F_des."""
         total_F_curr = moving_average[
