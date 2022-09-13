@@ -59,9 +59,10 @@ def main():
     parser.add_argument('--elast_mod', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
     parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of BioTac")
     parser.add_argument('--extract_stress', default=False, type=bool, help='Extract stress at each indentation step (will reduce simulation speed)')
-    parser.add_argument('--num_envs', default=3, type=int, help='Number of envs')
+    parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
+    parser.add_argument('--random_force', default=True, type=bool, help='Random the pressing force of the gripper')
     parser.add_argument('--random_rotation', default=True, type=bool, help='Random the rotation of the gripper')
-    parser.add_argument('--run_headless', default=False, type=bool, help='Random the rotation of the gripper')
+    parser.add_argument('--run_headless', default=False, type=bool, help='Run the simulator headless mode, i.e., no graphical interface')
     parser.add_argument('--export_results', default=True, type=bool, help='Export results to H5')
 
     args = parser.parse_args()
@@ -85,7 +86,7 @@ def main():
                                        options=asset_options)
 
     target_list  = target_name * args.num_envs
-    asset_options.thickness = 0.01
+    asset_options.thickness = 0.005 #0.005
     asset_handles_indenters = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'indenters'),
@@ -93,7 +94,7 @@ def main():
                                           options=asset_options)
     # Define and create scene
     scene_props = set_scene_props(num_envs=len(target_list))
-    env_handles, actor_handles_biotacs, actor_handles_indenters, z_angle,contact_loc  = create_scene(gym=gym, 
+    env_handles, actor_handles_biotacs, actor_handles_indenters, z_angle,press_loc  = create_scene(gym=gym, 
                                                                                sim=sim, 
                                                                                props=scene_props,
                                                                                assets_biotac=asset_handles_biotac,
@@ -114,6 +115,10 @@ def main():
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
+    if args.random_force:
+        press_force = np.array([0.0,random.randint(0, 100),0.0])
+    elif not args.random_force:
+        press_force = np.array([0.0,30.0,0.0])
     for i in range(len(env_handles)):
         sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
                             sim=sim, 
@@ -127,19 +132,18 @@ def main():
                             state=state,
                             target_object_name=target_name[0],
                             z_angle=z_angle[i],
-                            contact_loc=contact_loc[i])
+                            press_loc=press_loc[i],
+                            press_force=press_force,
+                            show_contacts=True)
         sponge_fsms.append(sponge_fsm)
 
     all_done = False
-    count = 0 
     result = []
+    print("Pressing sponge at force value: ", str(press_force[1]))
     while not all_done:
         if not args.run_headless:
             pass
 
-        for i in range(len(env_handles)):
-            if sponge_fsms[i].state == 'done':
-                count += 1
         all_done = all(sponge_fsms[i].state == 'done'
                        for i in range(len(env_handles)))
         
@@ -179,8 +183,7 @@ def main():
         os.makedirs(os.path.join(RESULTS_DIR, folder_name), exist_ok=True)
         if os.listdir(os.path.join(RESULTS_DIR, folder_name)):
             for file in os.listdir(os.path.join(RESULTS_DIR, folder_name)):
-                file_idx = int(regex.search(file).group(0))
-                # file_idx = int(os.path.splitext(file)[0][-1])
+                file_idx = int(regex.search(file).group(0)) #extract number from file name
                 file_idxes.append(file_idx)
             num_iter = max(file_idxes)+1
         else:
@@ -245,9 +248,9 @@ def create_sim(gym):
     sim_params.gravity = gymapi.Vec3(0.0, 0.0, 0.0)
 
     # enable Von-Mises stress visualization
-    # sim_params.stress_visualization = True
-    # sim_params.stress_visualization_min = 0.0
-    # sim_params.stress_visualization_max = 1.e+5
+    sim_params.stress_visualization = True
+    sim_params.stress_visualization_min = 0.0
+    sim_params.stress_visualization_max = 1.e+5
 
     sim_params.flex.solver_type = 5  # PCR (GPU, global)
     sim_params.flex.num_outer_iterations = 4
@@ -273,50 +276,20 @@ def create_viewer(gym, sim):
     """Create viewer and axes objects."""
 
     camera_props = gymapi.CameraProperties()
-    camera_props.horizontal_fov = 5.0
+    # camera_props.horizontal_fov = 5.0
     camera_props.width = 1920
     camera_props.height = 1080
     viewer = gym.create_viewer(sim, camera_props)
-    camera_pos = gymapi.Vec3(0.075, 3.0, 10.0)
-    camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
-    # camera_pos= gymapi.Vec3(0.05, 0.18, 0.003) #x ngang, y cao, z nhin xa
-    # camera_target = gymapi.Vec3(0.05, 0.00, 0.0)
+    # camera_pos = gymapi.Vec3(0.075, 3.0, 10.0)
+    # camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
+    camera_pos= gymapi.Vec3(0.05, 0.5, 0.5) #x ngang, y cao, z nhin xa
+    camera_target = gymapi.Vec3(0.05, 0.00, 0.0)
     gym.viewer_camera_look_at(viewer, None, camera_pos, camera_target)
 
     axes_geom = gymutil.AxesGeometry(0.1)
 
     return viewer, axes_geom
 
-
-def extract_elem_stresses(gym, sim, envs):
-    """Extract the element-wise von Mises stresses on the BioTac from each environment."""
-
-    (_, stresses) = gym.get_sim_tetrahedra(sim)
-    num_envs = gym.get_env_count(sim)
-    num_tets = len(stresses)
-    num_tets_per_env = int(num_tets / num_envs)
-    stresses_von_mises = np.zeros((num_envs, num_tets_per_env))
-
-    for env_index, env in enumerate(envs):
-        # Get tet range (start, count) for BioTac
-        tet_range = gym.get_actor_tetrahedra_range(env, 0, 0)
-
-        # Compute and store von Mises stress for each tet
-        # TODO: Vectorize for speed
-        for global_tet_index in range(tet_range.start, tet_range.start + tet_range.count):
-            stress = stresses[global_tet_index]
-            stress = np.matrix([(stress.x.x, stress.y.x, stress.z.x),
-                                (stress.x.y, stress.y.y, stress.z.y),
-                                (stress.x.z, stress.y.z, stress.z.z)])
-            stress_von_mises = np.sqrt(0.5 * \
-                                       ((stress[0, 0] - stress[1, 1]) ** 2 \
-                                      + (stress[1, 1] - stress[2, 2]) ** 2 \
-                                      + (stress[2, 2] - stress[0, 0]) ** 2 \
-                                      + 6 * (stress[1, 2] ** 2 + stress[2, 0] ** 2 + stress[0, 1] ** 2)))
-            local_tet_index = global_tet_index % num_tets_per_env
-            stresses_von_mises[env_index][local_tet_index] = stress_von_mises
-    
-    return stresses_von_mises
 
 def get_pose_and_draw(gym, env, viewer, axes, indenter):
     """Draw the pose of an indenter."""

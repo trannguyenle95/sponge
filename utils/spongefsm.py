@@ -22,8 +22,8 @@ from os.path import exists
 class SpongeFsm:
     """FSM for control of sponge the pushing test."""
     def __init__(self, gym, sim, envs, env_id, cam_handles,
-                 cam_props, sponge_actor, viewer, axes,state,target_object_name,z_angle,contact_loc,
-                 draw_pose=False, show_contacts=False):
+                 cam_props, sponge_actor, viewer, axes,state,target_object_name,z_angle,press_loc,press_force,
+                 show_contacts=False):
         """Initialize attributes of grasp evaluation FSM.
 
         Args:
@@ -67,17 +67,17 @@ class SpongeFsm:
         self.F_history = []
         self.filtered_forces =[]
         self.F_max_window_size = 300
-        self.torque_des = [0, -0.1, -0.1]
-        F_des_raw = np.array(
-                [0.0, 20.0, 0.0])            
-        self.F_des = np.asarray(F_des_raw, dtype=np.float32)
+        self.torque_des = [0, -0.1, -0.1]           
+        self.F_des = np.asarray(press_force, dtype=np.float32)
         self.state = state
         self.target_object_name = target_object_name
         self.pressed_forces = 0
         self.z_angle = z_angle
-        self.contact_locations= contact_loc
+        self.press_locations= press_loc
         self.action_success = False
         self.loop_start = None
+        self.contacts = np.array([])
+        self.show_contacts = show_contacts
     def run_state_machine(self):
         """Run state machine for running pressing tests."""
         results = []
@@ -87,7 +87,6 @@ class SpongeFsm:
         if self.state == "init":
             self.started = True
             self.state = "capture_target_pc"
-            
         # Get particle state tensor and convert to PyTorch tensor
         self.particle_state_tensor = gymtorch.wrap_tensor(self.gym.acquire_particle_state_tensor(self.sim))
         self.gym.refresh_particle_state_tensor(self.sim)
@@ -114,8 +113,6 @@ class SpongeFsm:
             indenter_dof_pos = indenter_dof_state['pos']
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
-            print(F_curr)
-
             if F_curr.all() == 0:
                 vel_des = -0.3
                 if indenter_dof_pos < -0.3:
@@ -138,7 +135,6 @@ class SpongeFsm:
             # print("pressing")
             # =================================================
             # Process finger grasp forces with LP filter and moving average
-            print("self.loop_start: ", self.loop_start, "-----  ", (timeit.default_timer() - self.loop_start))
             if (timeit.default_timer() - self.loop_start) < 15:
                 self.F_curr = data_utils.extract_net_forces(self.gym,self.sim)  
                 self.F_history.append(np.sum(self.F_curr[1:]))
@@ -161,13 +157,19 @@ class SpongeFsm:
                                         self.torque_des_force[1])
                 # print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])))
                 # if  np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])) < np.abs(0.05 * self.F_des[1]):
+                if self.show_contacts:
+                    self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
+                    self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
+
                 print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])))
                 if  np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])) < np.abs(0.05 * self.F_des[1]):
                     self.pressed_forces = data_utils.extract_net_forces(self.gym,self.sim)[self.env_id][1] 
                     self.state = "capture_final_state"
-            else:
+            else: #Fail state
                 self.action_success = False
                 self.sponge_position_at_force = np.zeros((self.state_tensor_length,3))
+                self.normal_forces_on_nodes = np.zeros((self.state_tensor_length,3))
+                self.contact_indexes = np.zeros((self.state_tensor_length))
                 self.pressed_forces = 0
                 self.state = "done"
 
@@ -178,12 +180,17 @@ class SpongeFsm:
                                                    sim=self.sim, 
                                                    particle_states=deformed_state) 
             self.sponge_position_at_force = self.deformed_state_all_envs[self.env_id]
-
+            self.contacts = self.gym.get_soft_contacts(self.sim)    
+            normal_forces_on_nodes, contact_indexes = data_utils.extract_nodal_force(self.gym,self.sim,deformed_state)
+            self.normal_forces_on_nodes = normal_forces_on_nodes[self.env_id]
+            self.contact_indexes = contact_indexes[self.env_id]
             pcd = open3d.geometry.PointCloud()
             pcd.points = open3d.utility.Vector3dVector(np.array(self.deformed_state_all_envs[self.env_id]))
             target_pcd = open3d.io.read_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd")
-            # open3d_utils.visualize_pc_open3d(target_pcd+pcd)
+            open3d_utils.visualize_pc_open3d(target_pcd+pcd)
             self.action_success = True
             self.state = "done"                
         return
+
+   
 
