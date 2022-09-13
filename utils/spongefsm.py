@@ -115,10 +115,9 @@ class SpongeFsm:
             F_curr = F_curr_all_env[self.env_id]
             if F_curr.all() == 0:
                 vel_des = -0.3
-                if indenter_dof_pos < -0.3:
+                if indenter_dof_pos < -0.34:
                     vel_des = -0.02  
 
-                print(vel_des)
                 dof_props = self.gym.get_actor_dof_properties(self.env, self.sponge_actor)
                 dof_props['driveMode'][0] = gymapi.DOF_MODE_VEL
 

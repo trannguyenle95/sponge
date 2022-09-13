@@ -27,9 +27,9 @@ def extract_nodal_force(gym, sim, particle_states):
     num_particles_per_env = int(num_particles /  num_envs)
 
     forces_on_nodes = np.zeros((num_particles,3))
-    nodal_forces = np.zeros((num_envs,num_particles,3))
+    nodal_forces = np.zeros((num_envs,num_particles_per_env,3))
     contact_indexes_all = np.zeros((num_particles))
-    contact_indexes_per_env = np.zeros((num_envs,num_particles))
+    contact_indexes_per_env = np.zeros((num_envs,num_particles_per_env))
     for contact in contacts:
         rigid_body_index = contact[4]
         contact_normal = np.array([*contact[6]])
@@ -39,7 +39,6 @@ def extract_nodal_force(gym, sim, particle_states):
         for node, bary in zip(contact[2] , contact[3]):
             forces_on_nodes[node] += bary * np.abs(force_vec)
             contact_indexes_all[node] = 1
-    print(forces_on_nodes.shape, "--", str(np.all((forces_on_nodes == 0))))
     for idx, forces_on_node in enumerate(forces_on_nodes):
         nodal_force = forces_on_nodes[idx,:3]
         env_index = idx // num_particles_per_env
@@ -48,6 +47,7 @@ def extract_nodal_force(gym, sim, particle_states):
 
         contact_indexes = contact_indexes_all[idx]
         contact_indexes_per_env[env_index][local_particle_index] = contact_indexes
+
     return nodal_forces, contact_indexes_per_env
 
 def extract_net_forces(gym, sim):
@@ -95,7 +95,7 @@ def extract_elem_stresses(gym, sim, envs):
             stresses_von_mises[env_index][local_tet_index] = stress_von_mises
     
     return stresses_von_mises
-    
+
 def write_metrics_to_h5(num_envs,h5_file_path, sponge_fsms):
     """Write metrics and features to h5 result file."""
     h5_file_name = h5_file_path

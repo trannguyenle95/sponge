@@ -48,13 +48,9 @@ np.set_printoptions(threshold=np.inf)
 # Set target indenter pose
 RESULTS_DIR = "results/"
 RESULTS_STORAGE_TAG = "_local"
-INDENT_TARGET = [0.075, 0.25, 0.0,   # Position of tip
-                 1.0, 0.0, 0.0,         # Orientation of x-axis       
-                 0.0, 1.0, 0.0,         # Orientation of y-axis
-                 0.0, 0.0, 1.0]         # Orientation of z-axis
-target_name = ['plate_ycb']
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--object', required=True, help="Name of object")
     parser.add_argument('--density', default=100, type=float, help="Density")
     parser.add_argument('--elast_mod', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
     parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of BioTac")
@@ -66,6 +62,7 @@ def main():
     parser.add_argument('--export_results', default=True, type=bool, help='Export results to H5')
 
     args = parser.parse_args()
+    target_name = [args.object]
 
     gym = gymapi.acquire_gym()
     state = "capture_target_pc"
@@ -96,6 +93,7 @@ def main():
     scene_props = set_scene_props(num_envs=len(target_list))
     env_handles, actor_handles_biotacs, actor_handles_indenters, z_angle,press_loc  = create_scene(gym=gym, 
                                                                                sim=sim, 
+                                                                               object_name=target_name[0],
                                                                                props=scene_props,
                                                                                assets_biotac=asset_handles_biotac,
                                                                                assets_indenters=asset_handles_indenters,
@@ -115,31 +113,42 @@ def main():
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
-    if args.random_force:
-        press_force = np.array([0.0,random.randint(0, 100),0.0])
-    elif not args.random_force:
-        press_force = np.array([0.0,30.0,0.0])
     for i in range(len(env_handles)):
-        sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
-                            sim=sim, 
-                            envs=env_handles, 
-                            env_id = i,
-                            cam_handles=cam_handles[i],
-                            cam_props = cam_props[i],
-                            sponge_actor=actor_handles_biotacs,
-                            viewer=viewer,
-                            axes=axes_geom,
-                            state=state,
-                            target_object_name=target_name[0],
-                            z_angle=z_angle[i],
-                            press_loc=press_loc[i],
-                            press_force=press_force,
-                            show_contacts=True)
+        if args.random_force:       
+            sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
+                                sim=sim, 
+                                envs=env_handles, 
+                                env_id = i,
+                                cam_handles=cam_handles[i],
+                                cam_props = cam_props[i],
+                                sponge_actor=actor_handles_biotacs,
+                                viewer=viewer,
+                                axes=axes_geom,
+                                state=state,
+                                target_object_name=target_name[0],
+                                z_angle=z_angle[i],
+                                press_loc=press_loc[i],
+                                press_force=np.array([0.0,random.randint(0, 70),0.0]),
+                                show_contacts=True)
+        elif not args.random_force:
+            sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
+                                sim=sim, 
+                                envs=env_handles, 
+                                env_id = i,
+                                cam_handles=cam_handles[i],
+                                cam_props = cam_props[i],
+                                sponge_actor=actor_handles_biotacs,
+                                viewer=viewer,
+                                axes=axes_geom,
+                                state=state,
+                                target_object_name=target_name[0],
+                                z_angle=z_angle[i],
+                                press_loc=press_loc[i],
+                                press_force=np.array([0.0,20.0,0.0]),
+                                show_contacts=True)
         sponge_fsms.append(sponge_fsm)
-
     all_done = False
     result = []
-    print("Pressing sponge at force value: ", str(press_force[1]))
     while not all_done:
         if not args.run_headless:
             pass
@@ -151,7 +160,7 @@ def main():
         for i in range(len(env_handles)):
             if sponge_fsms[i].state != "done":
                 sponge_fsms[i].run_state_machine()
-            print("State env ", str(i), "---- state: ",sponge_fsms[i].state)
+            print("State env ", str(i), "---- state: ",sponge_fsms[i].state, "----- force: ", sponge_fsms[i].F_des[1])
 
         # Run simulation
         gym.simulate(sim)
@@ -193,7 +202,7 @@ def main():
         data_utils.write_metrics_to_h5(num_envs=len(env_handles),h5_file_path=h5_file_path,sponge_fsms=sponge_fsms)
     
 
-def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.05,random_rotation=False):
+def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.05,random_rotation=False):
     """Create a scene (i.e., ground plane, environments, BioTac actors, and indenter actors)."""
     z_angle = 0
     plane_params = gymapi.PlaneParams()
@@ -202,7 +211,7 @@ def create_scene(gym, sim, props, assets_biotac, assets_indenters, biotac_offset
     env_handles = []
     actor_handles_biotacs = []
     actor_handles_indenters = []
-    target_object_pcd_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+target_name[0]+".pcd"
+    target_object_pcd_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+object_name+".pcd"
     if os.path.exists(target_object_pcd_file):
         sampled_points = open3d_utils.sample_points_from_pcd(target_object_pcd_file,props['num_envs'])
     else:
@@ -282,8 +291,8 @@ def create_viewer(gym, sim):
     viewer = gym.create_viewer(sim, camera_props)
     # camera_pos = gymapi.Vec3(0.075, 3.0, 10.0)
     # camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
-    camera_pos= gymapi.Vec3(0.05, 0.5, 0.5) #x ngang, y cao, z nhin xa
-    camera_target = gymapi.Vec3(0.05, 0.00, 0.0)
+    camera_pos= gymapi.Vec3(0.5, 0.5, 0.5) #x ngang, y cao, z nhin xa
+    camera_target = gymapi.Vec3(0.5, 0.00, 0.0)
     gym.viewer_camera_look_at(viewer, None, camera_pos, camera_target)
 
     axes_geom = gymutil.AxesGeometry(0.1)
