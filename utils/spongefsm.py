@@ -73,7 +73,7 @@ class SpongeFsm:
         self.target_object_name = target_object_name
         self.pressed_forces = 0
         self.z_angle = z_angle
-        self.press_locations= press_loc
+        self.press_locations_buffer= press_loc
         self.action_success = False
         self.loop_start = None
         self.contacts = np.array([])
@@ -169,6 +169,9 @@ class SpongeFsm:
                 self.sponge_position_at_force = np.zeros((self.state_tensor_length,3))
                 self.normal_forces_on_nodes = np.zeros((self.state_tensor_length,3))
                 self.contact_indexes = np.zeros((self.state_tensor_length))
+                self.press_locations = np.zeros((1,3))
+                print("test: ",self.press_locations)
+
                 self.pressed_forces = 0
                 self.state = "done"
 
@@ -187,6 +190,8 @@ class SpongeFsm:
             pcd.points = open3d.utility.Vector3dVector(np.array(self.deformed_state_all_envs[self.env_id]))
             target_pcd = open3d.io.read_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd")
             open3d_utils.visualize_pc_open3d(target_pcd+pcd)
+            self.press_locations = self.press_locations_buffer
+            print(self.press_locations)
             self.action_success = True
             self.state = "done"                
         return

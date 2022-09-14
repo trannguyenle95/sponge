@@ -97,7 +97,8 @@ def main():
                                                                                props=scene_props,
                                                                                assets_biotac=asset_handles_biotac,
                                                                                assets_indenters=asset_handles_indenters,
-                                                                               random_rotation = args.random_rotation)    
+                                                                               random_rotation = args.random_rotation)  
+    print(press_loc)
     if not args.run_headless:
         viewer, axes_geom = create_viewer(gym=gym, 
                                         sim=sim)
@@ -128,7 +129,7 @@ def main():
                                 target_object_name=target_name[0],
                                 z_angle=z_angle[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,random.randint(0, 70),0.0]),
+                                press_force=np.array([0.0,random.randint(5, 70),0.0]),
                                 show_contacts=True)
         elif not args.random_force:
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
@@ -237,7 +238,6 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
         pose.r = gymapi.Quat(*quat)
         actor_handle_biotac = gym.create_actor(env_handle, assets_biotac[0], pose, f"biotac_{i}", collision_group, collision_filter)
         actor_handles_biotacs.append(actor_handle_biotac)
-
         pose.p = gymapi.Vec3(0.0, indenter_offset, 0.0)
         r = R.from_euler('XYZ', [0, 0, 0], degrees=True)
         quat = r.as_quat()
@@ -291,7 +291,7 @@ def create_viewer(gym, sim):
     viewer = gym.create_viewer(sim, camera_props)
     # camera_pos = gymapi.Vec3(0.075, 3.0, 10.0)
     # camera_target = gymapi.Vec3(0.075, 0.0, 0.0)
-    camera_pos= gymapi.Vec3(0.5, 0.5, 0.5) #x ngang, y cao, z nhin xa
+    camera_pos= gymapi.Vec3(0.5, 0.18, 0.5) #x ngang, y cao, z nhin xa
     camera_target = gymapi.Vec3(0.5, 0.00, 0.0)
     gym.viewer_camera_look_at(viewer, None, camera_pos, camera_target)
 
