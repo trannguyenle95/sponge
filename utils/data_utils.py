@@ -124,8 +124,9 @@ def write_metrics_to_h5(num_envs,h5_file_path, sponge_fsms):
                               (num_envs, 1,3,),
                               maxshape=(None, 1,3))
             
-            hf.create_dataset("z_angle", (num_envs,),
-                              maxshape=(None,))
+            hf.create_dataset("gripper_ori", 
+                              (num_envs, 1,3,),
+                              maxshape=(None, 1,3))
 
             # Desired force setpoints
 
@@ -153,8 +154,8 @@ def write_metrics_to_h5(num_envs,h5_file_path, sponge_fsms):
                 press_location_dset = hf['press_locations']
                 press_location_dset[i, :, :] = sponge_fsm.press_locations
 
-                z_angle_dset = hf['z_angle']
-                z_angle_dset[i] = sponge_fsm.z_angle
+                gripper_ori_dset = hf['gripper_ori']
+                gripper_ori_dset[i, :, :] = sponge_fsm.gripper_ori
 
                 pressed_forces_dset = hf['pressed_forces']
                 pressed_forces_dset[i] = sponge_fsm.pressed_forces

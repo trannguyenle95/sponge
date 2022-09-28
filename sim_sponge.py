@@ -91,14 +91,13 @@ def main():
                                           options=asset_options)
     # Define and create scene
     scene_props = set_scene_props(num_envs=len(target_list))
-    env_handles, actor_handles_biotacs, actor_handles_indenters, z_angle,press_loc  = create_scene(gym=gym, 
+    env_handles, actor_handles_biotacs, actor_handles_indenters, gripper_rotation_with_random_z,press_loc  = create_scene(gym=gym, 
                                                                                sim=sim, 
                                                                                object_name=target_name[0],
                                                                                props=scene_props,
                                                                                assets_biotac=asset_handles_biotac,
                                                                                assets_indenters=asset_handles_indenters,
                                                                                random_rotation = args.random_rotation)  
-    print(press_loc)
     if not args.run_headless:
         viewer, axes_geom = create_viewer(gym=gym, 
                                         sim=sim)
@@ -127,7 +126,7 @@ def main():
                                 axes=axes_geom,
                                 state=state,
                                 target_object_name=target_name[0],
-                                z_angle=z_angle[i],
+                                gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
                                 press_force=np.array([0.0,random.randint(5, 70),0.0]),
                                 show_contacts=True)
@@ -143,7 +142,7 @@ def main():
                                 axes=axes_geom,
                                 state=state,
                                 target_object_name=target_name[0],
-                                z_angle=z_angle[i],
+                                gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
                                 press_force=np.array([0.0,20.0,0.0]),
                                 show_contacts=True)
@@ -214,11 +213,13 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
     actor_handles_indenters = []
     target_object_pcd_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+object_name+".pcd"
     if os.path.exists(target_object_pcd_file):
-        sampled_points = open3d_utils.sample_points_from_pcd(target_object_pcd_file,props['num_envs'])
+        sampled_points_real, sampled_points_approach , sampled_points_normals, sampled_points_normals_euler = open3d_utils.sample_points_and_normals_from_pcd(target_object_pcd_file,props['num_envs'])
     else:
         print("Point cloud of this object does not exist")
-        sampled_points = np.tile(np.array([0.0,0.0,0.0]),(props['num_envs'],3))
-    z_angles = []
+        sampled_points_real = np.tile(np.array([0.0,0.0,0.0]),(props['num_envs'],3))
+        sampled_points_approach = np.tile(np.array([0.0,0.0,0.0]),(props['num_envs'],3))
+        sampled_points_normals_euler =  np.tile(np.array([0.0,0.0,0.0]),(props['num_envs'],3))
+    gripper_rotation_with_random_z = []
     for i in range(props['num_envs']):
         env_handle = gym.create_env(sim, props['lower'], props['upper'], props['per_row'])
         env_handles.append(env_handle)
@@ -226,14 +227,16 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
         pose = gymapi.Transform()
         collision_group = i
         collision_filter = 0
+        # pose.p = gymapi.Vec3(sampled_points[i][0], biotac_offset, sampled_points[i][2])
+        pose.p = gymapi.Vec3(sampled_points_approach[i][0], sampled_points_approach[i][1], sampled_points_approach[i][2])
 
-        pose.p = gymapi.Vec3(sampled_points[i][0], biotac_offset, sampled_points[i][2])
-        # pose.p = gymapi.Vec3(0.0, biotac_offset, 0.0)
         if random_rotation:
             z_angle = random.randint(-90, 90)
         elif not random_rotation:
             z_angle = 0    
-        r = R.from_euler('XYZ', [0, z_angle , 0], degrees=True)
+        gripper_rotation_per_env = np.array([sampled_points_normals_euler[i][0],z_angle,sampled_points_normals_euler[i][2]])
+        r = R.from_euler('XYZ',gripper_rotation_per_env, degrees=True)
+        gripper_rotation_with_random_z.append(gripper_rotation_per_env)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
         actor_handle_biotac = gym.create_actor(env_handle, assets_biotac[0], pose, f"biotac_{i}", collision_group, collision_filter)
@@ -244,8 +247,7 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
         pose.r = gymapi.Quat(*quat)
         actor_handle_indenter = gym.create_actor(env_handle, assets_indenters[i], pose, f"indenter_{i}", collision_group, collision_filter,segmentationId=10)
         actor_handles_indenters.append(actor_handle_indenter)
-        z_angles.append(z_angle)
-    return env_handles, actor_handles_biotacs, actor_handles_indenters, z_angles,sampled_points
+    return env_handles, actor_handles_biotacs, actor_handles_indenters, gripper_rotation_with_random_z,sampled_points_real
 
 def create_sim(gym):
     """Set the simulation parameters and create a Sim object."""

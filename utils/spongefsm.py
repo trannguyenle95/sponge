@@ -22,7 +22,7 @@ from os.path import exists
 class SpongeFsm:
     """FSM for control of sponge the pushing test."""
     def __init__(self, gym, sim, envs, env_id, cam_handles,
-                 cam_props, sponge_actor, viewer, axes,state,target_object_name,z_angle,press_loc,press_force,
+                 cam_props, sponge_actor, viewer, axes,state,target_object_name,gripper_ori,press_loc,press_force,
                  show_contacts=False):
         """Initialize attributes of grasp evaluation FSM.
 
@@ -72,7 +72,7 @@ class SpongeFsm:
         self.state = state
         self.target_object_name = target_object_name
         self.pressed_forces = 0
-        self.z_angle = z_angle
+        self.gripper_ori = gripper_ori
         self.press_locations_buffer= press_loc
         self.action_success = False
         self.loop_start = None
@@ -113,10 +113,10 @@ class SpongeFsm:
             indenter_dof_pos = indenter_dof_state['pos']
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
-            if F_curr.all() == 0:
-                vel_des = -0.3
-                if indenter_dof_pos < -0.34:
-                    vel_des = -0.02  
+            if F_curr[1] < 2.5:
+                vel_des = -0.03
+                # if indenter_dof_pos < -0.34:
+                #     vel_des = -0.02  
 
                 dof_props = self.gym.get_actor_dof_properties(self.env, self.sponge_actor)
                 dof_props['driveMode'][0] = gymapi.DOF_MODE_VEL
@@ -124,7 +124,7 @@ class SpongeFsm:
                 self.gym.set_actor_dof_properties(self.env,self.sponge_actor,dof_props)
 
                 self.gym.set_actor_dof_velocity_targets(self.env,self.sponge_actor,vel_des)
-            elif F_curr[1] > 2.5:
+            elif np.abs(F_curr[1]) > 2.5:
                 self.loop_start = timeit.default_timer()
                 self.state = "press"
                 self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
