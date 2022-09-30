@@ -173,7 +173,7 @@ def main():
         num_iter = 0
         object_name = target_name[0]
         big_folder_name = object_name + RESULTS_STORAGE_TAG
-        small_folder_name = object_name + "_" + str(args.youngs)
+        small_folder_name = object_name + "_" + str(int(args.youngs))
         file_idxes = []
         os.makedirs(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name), exist_ok=True)
         if os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
