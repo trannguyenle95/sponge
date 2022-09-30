@@ -14,8 +14,8 @@ from shutil import copyfile
 
 # ==================== SIM UTILS ====================================
 
-def set_biotac_matl_props(base_dir, elast_mod, poiss_ratio,density):
-    """Set the BioTac material properties by copying and modifying a URDF template."""
+def set_sponge_matl_props(base_dir, elast_mod, poiss_ratio,density):
+    """Set the Sponge material properties by copying and modifying a URDF template."""
     # TODO: There may be now be a built-in function for setting material properties in the Gym Python API.
 
     template_path = os.path.join(base_dir, 'sponge_template.urdf')

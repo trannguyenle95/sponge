@@ -1,27 +1,8 @@
-# Copyright (c) 2021 NVIDIA Corporation
-
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included
-# in all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
+# Author: Tran Nguyen Le
 
 """
-Simulate indentations of the BioTac sensor with 8 different indenters for a sample trajectory.
+Simulate a deformable sponge pressing on different targetobjects.
 
-Extracts net force vectors, nodal coordinates, and optionally, element-wise stresses for the BioTac.
 """
 from ast import arg
 import re
@@ -48,7 +29,7 @@ import numpy as np
 from distutils.util import strtobool
 
 np.set_printoptions(threshold=np.inf)
-# Set target indenter pose
+# Set target targetobject pose
 RESULTS_DIR = "results/"
 RESULTS_STORAGE_TAG = "_all"
 def main():
@@ -56,8 +37,8 @@ def main():
     parser.register('type', 'boolean', strtobool) #to help deal with problem bool("False")=True
     parser.add_argument('--object', required=True, help="Name of object")
     parser.add_argument('--density', default=100, type=float, help="Density")
-    parser.add_argument('--youngs', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
-    parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of BioTac")
+    parser.add_argument('--youngs', default=1000, type=float, help="Elastic modulus of the sponge [Pa]")
+    parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of sponge")
     parser.add_argument('--extract_stress', default=False, type='boolean', help='Extract stress at each indentation step (will reduce simulation speed)')
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
     parser.add_argument('--random_force', default=True, type='boolean', help='Random the rotation of the gripper')
@@ -74,32 +55,32 @@ def main():
     sim = create_sim(gym=gym)
     # Define and load assets
     asset_options = set_asset_options()
-    biotac_urdf_dir = os.path.join('urdf', 'biotac', 'shell_core')
-    sim_utils.set_biotac_matl_props(base_dir=biotac_urdf_dir,
+    sponge_urdf_dir = os.path.join('urdf', 'sponge')
+    sim_utils.set_sponge_matl_props(base_dir=sponge_urdf_dir,
                           elast_mod=args.youngs,
                           poiss_ratio=args.poiss_ratio,
                           density=args.density)
-    asset_handles_biotac = load_assets(gym=gym,
+    asset_handles_sponge = load_assets(gym=gym,
                                        sim=sim,
-                                       base_dir=biotac_urdf_dir,
+                                       base_dir=sponge_urdf_dir,
                                        objects=['soft_body'],
                                        options=asset_options)
 
     target_list  = target_name * args.num_envs
-    asset_options.thickness = 0.006 #0.005 
-    asset_handles_indenters = load_assets(gym=gym,
+    asset_options.thickness = 0.006 #0.005 to avoid interpenetration
+    asset_handles_targetobjects = load_assets(gym=gym,
                                           sim=sim,
-                                          base_dir=os.path.join('urdf', 'indenters'),
+                                          base_dir=os.path.join('urdf', 'targetobjects'),
                                           objects=target_list,
                                           options=asset_options)
     # Define and create scene
     scene_props = set_scene_props(num_envs=len(target_list))
-    env_handles, actor_handles_biotacs, actor_handles_indenters, gripper_rotation_with_random_z,press_loc  = create_scene(gym=gym, 
+    env_handles, actor_handles_sponges, actor_handles_targetobjects, gripper_rotation_with_random_z,press_loc  = create_scene(gym=gym, 
                                                                                sim=sim, 
                                                                                object_name=target_name[0],
                                                                                props=scene_props,
-                                                                               assets_biotac=asset_handles_biotac,
-                                                                               assets_indenters=asset_handles_indenters,
+                                                                               assets_sponge=asset_handles_sponge,
+                                                                               assets_targetobjects=asset_handles_targetobjects,
                                                                                random_rotation = args.random_rotation)  
     if not args.run_headless:
         viewer, axes_geom = create_viewer(gym=gym, 
@@ -109,10 +90,10 @@ def main():
         axes_geom = None
     # Setup cameras
     cam_handles,cam_props = sim_utils.setup_cam(gym, env_handles, scene_props)
-    # Define controller for indenters
+    # Define controller for targetobjects
     # set_ctrl_props(gym=gym,
     #                envs=env_handles,
-    #                indenters=actor_handles_biotacs)    
+    #                targetobjects=actor_handles_sponges)    
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
@@ -125,7 +106,7 @@ def main():
                                 env_id = i,
                                 cam_handles=cam_handles[i],
                                 cam_props = cam_props[i],
-                                sponge_actor=actor_handles_biotacs,
+                                sponge_actor=actor_handles_sponges,
                                 viewer=viewer,
                                 axes=axes_geom,
                                 state=state,
@@ -141,7 +122,7 @@ def main():
                                 env_id = i,
                                 cam_handles=cam_handles[i],
                                 cam_props = cam_props[i],
-                                sponge_actor=actor_handles_biotacs,
+                                sponge_actor=actor_handles_sponges,
                                 viewer=viewer,
                                 axes=axes_geom,
                                 state=state,
@@ -207,15 +188,15 @@ def main():
         data_utils.write_metrics_to_h5(num_envs=len(env_handles),h5_file_path=h5_file_path,sponge_fsms=sponge_fsms)
     
 
-def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, biotac_offset=0.2, indenter_offset=0.05,random_rotation=False):
-    """Create a scene (i.e., ground plane, environments, BioTac actors, and indenter actors)."""
+def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjects, sponge_offset=0.2, targetobject_offset=0.05,random_rotation=False):
+    """Create a scene (i.e., ground plane, environments, BioTac actors, and targetobject actors)."""
     z_angle = 0
     plane_params = gymapi.PlaneParams()
     gym.add_ground(sim, plane_params)
 
     env_handles = []
-    actor_handles_biotacs = []
-    actor_handles_indenters = []
+    actor_handles_sponges = []
+    actor_handles_targetobjects = []
     target_object_pcd_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+object_name+".pcd"
     if os.path.exists(target_object_pcd_file):
         sampled_points_real, sampled_points_approach , sampled_points_normals, sampled_points_normals_euler = open3d_utils.sample_points_and_normals_from_pcd(target_object_pcd_file,props['num_envs'])
@@ -232,7 +213,7 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
         pose = gymapi.Transform()
         collision_group = i
         collision_filter = 0
-        # pose.p = gymapi.Vec3(sampled_points[i][0], biotac_offset, sampled_points[i][2])
+        # pose.p = gymapi.Vec3(sampled_points[i][0], sponge_offset, sampled_points[i][2])
         pose.p = gymapi.Vec3(sampled_points_approach[i][0], sampled_points_approach[i][1], sampled_points_approach[i][2])
 
         if random_rotation:
@@ -244,15 +225,15 @@ def create_scene(gym, sim, object_name, props, assets_biotac, assets_indenters, 
         gripper_rotation_with_random_z.append(gripper_rotation_per_env)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
-        actor_handle_biotac = gym.create_actor(env_handle, assets_biotac[0], pose, f"biotac_{i}", collision_group, collision_filter)
-        actor_handles_biotacs.append(actor_handle_biotac)
-        pose.p = gymapi.Vec3(0.0, indenter_offset, 0.0)
+        actor_handle_sponge = gym.create_actor(env_handle, assets_sponge[0], pose, f"sponge_{i}", collision_group, collision_filter)
+        actor_handles_sponges.append(actor_handle_sponge)
+        pose.p = gymapi.Vec3(0.0, targetobject_offset, 0.0)
         r = R.from_euler('XYZ', [0, 0, 0], degrees=True)
         quat = r.as_quat()
         pose.r = gymapi.Quat(*quat)
-        actor_handle_indenter = gym.create_actor(env_handle, assets_indenters[i], pose, f"indenter_{i}", collision_group, collision_filter,segmentationId=10)
-        actor_handles_indenters.append(actor_handle_indenter)
-    return env_handles, actor_handles_biotacs, actor_handles_indenters, gripper_rotation_with_random_z,sampled_points_real
+        actor_handle_targetobject = gym.create_actor(env_handle, assets_targetobjects[i], pose, f"targetobject_{i}", collision_group, collision_filter,segmentationId=10)
+        actor_handles_targetobjects.append(actor_handle_targetobject)
+    return env_handles, actor_handles_sponges, actor_handles_targetobjects, gripper_rotation_with_random_z,sampled_points_real
 
 def create_sim(gym):
     """Set the simulation parameters and create a Sim object."""
@@ -308,11 +289,11 @@ def create_viewer(gym, sim):
     return viewer, axes_geom
 
 
-def get_pose_and_draw(gym, env, viewer, axes, indenter):
-    """Draw the pose of an indenter."""
+def get_pose_and_draw(gym, env, viewer, axes, targetobject):
+    """Draw the pose of an targetobject."""
 
-    indenter_pose = gym.get_actor_rigid_body_states(env, indenter, gymapi.STATE_POS)['pose']
-    pose_to_draw = gymapi.Transform.from_buffer(indenter_pose)
+    targetobject_pose = gym.get_actor_rigid_body_states(env, targetobject, gymapi.STATE_POS)['pose']
+    pose_to_draw = gymapi.Transform.from_buffer(targetobject_pose)
     gymutil.draw_lines(axes, gym, viewer, env, pose_to_draw)
 
 
@@ -328,10 +309,10 @@ def load_assets(gym, sim, base_dir, objects, options, fix=True, gravity=False):
     
     return handles
 
-def reset_biotac_state(gym, sim, biotac_state):
-    """Reset the BioTac particle states to their initial states."""
+def reset_sponge_state(gym, sim, sponge_state):
+    """Reset the sponge particle states to their initial states."""
 
-    gym.set_particle_state_tensor(sim, gymtorch.unwrap_tensor(biotac_state))
+    gym.set_particle_state_tensor(sim, gymtorch.unwrap_tensor(sponge_state))
 
 def set_asset_options():
     """Set asset options common to all assets."""

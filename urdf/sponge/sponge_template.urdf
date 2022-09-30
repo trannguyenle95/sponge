@@ -46,7 +46,7 @@
 			<poissons value=""/>
 			<damping value="0"/>
 			<attachDistance value="0.01"/>
-			<tetmesh filename="../../../meshes/sponge/sponge_more_node.tet"/>
+			<tetmesh filename="../../meshes/sponge/sponge_more_node.tet"/>
         </fem>
 	</link>
 </robot>

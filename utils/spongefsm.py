@@ -90,12 +90,12 @@ class SpongeFsm:
         # Get particle state tensor and convert to PyTorch tensor
         self.particle_state_tensor = gymtorch.wrap_tensor(self.gym.acquire_particle_state_tensor(self.sim))
         self.gym.refresh_particle_state_tensor(self.sim)
-        biotac_state_init = copy.deepcopy(self.particle_state_tensor)
-        biotac_state_init_array = self.particle_state_tensor.numpy()[:, :3].astype('float32')  
-        self.state_tensor_length = int(biotac_state_init_array.shape[0]/self.num_envs)
+        sponge_state_init = copy.deepcopy(self.particle_state_tensor)
+        sponge_state_init_array = self.particle_state_tensor.numpy()[:, :3].astype('float32')  
+        self.state_tensor_length = int(sponge_state_init_array.shape[0]/self.num_envs)
 
         # pcd = open3d.geometry.PointCloud()
-        # pcd.points = open3d.utility.Vector3dVector(np.array(biotac_state_init_array))
+        # pcd.points = open3d.utility.Vector3dVector(np.array(sponge_state_init_array))
         # open3d.io.write_point_cloud("/home/trannguyenle/test.pcd", pcd)
 
         if self.state == "capture_target_pc":
@@ -109,13 +109,14 @@ class SpongeFsm:
             self.state = "approach"
 
         elif self.state == "approach":
-            indenter_dof_state = self.gym.get_actor_dof_states(self.env, self.sponge_actor, gymapi.STATE_ALL)
-            indenter_dof_pos = indenter_dof_state['pos']
+            targetobject_dof_state = self.gym.get_actor_dof_states(self.env, self.sponge_actor, gymapi.STATE_ALL)
+            targetobject_dof_pos = targetobject_dof_state['pos']
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
-            if np.abs(F_curr[1]) < 1:
+            self.approach_start = timeit.default_timer()
+            if np.abs(F_curr[1]) < 1 and (timeit.default_timer() - self.approach_start) < 10:
                 vel_des = -0.03
-                # if indenter_dof_pos < -0.34:
+                # if targetobject_dof_pos < -0.34:
                 #     vel_des = -0.02  
 
                 dof_props = self.gym.get_actor_dof_properties(self.env, self.sponge_actor)
