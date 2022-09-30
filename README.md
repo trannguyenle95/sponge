@@ -1,7 +1,5 @@
-# BioTac Sim
-This repo contains simulation scripts and assets for the ICRA 2021 paper, "Sim-to-real for robotic tactile sensing via physics-based simulation and learned latent projections." ([paper](https://arxiv.org/abs/2103.16747) | [website](https://sites.google.com/nvidia.com/tactiledata2))
-
-The script provides a simple example of how to import the BioTac assets into NVIDIA Isaac Gym, launch an FEM simulation with multiple indenters across multiple parallel environments, and extract useful features (net forces, nodal coordinates, and element-wise stresses).
+# Sponge Sim
+The script provides a simple example of how to import the Sponge assets into NVIDIA Isaac Gym, launch an FEM simulation with multiple objects across multiple parallel environments, and extract useful features (net forces, nodal coordinates, and element-wise stresses).
 
 ## Installation:
 - Clone repo
@@ -10,10 +8,10 @@ The script provides a simple example of how to import the BioTac assets into NVI
 - Install `h5py` package via Conda
 
 ## Usage:
-- Execute `sim_biotac.py`
+- Execute `sim_sponge.py --object="target_object" --num_envs=1 --youngs=1000`
     - See code for available command line switches
-- View `results.hdf5`
-    - File structure is `timestep / feature / environment / data`
+- View `results/object/object_youngs`
+    - File structure is `action_success / contact_indexes / gripper_ori / normal_forces_on_nodes / press_locations / press_forces /sponge_position_at_force`
 
 ## FAQ:
 - Error: `cannot open shared object file`
