@@ -113,7 +113,7 @@ class SpongeFsm:
             indenter_dof_pos = indenter_dof_state['pos']
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
-            if F_curr[1] < 2.5:
+            if np.abs(F_curr[1]) < 1:
                 vel_des = -0.03
                 # if indenter_dof_pos < -0.34:
                 #     vel_des = -0.02  
@@ -124,7 +124,7 @@ class SpongeFsm:
                 self.gym.set_actor_dof_properties(self.env,self.sponge_actor,dof_props)
 
                 self.gym.set_actor_dof_velocity_targets(self.env,self.sponge_actor,vel_des)
-            elif np.abs(F_curr[1]) > 2.5:
+            elif np.abs(F_curr[1]) > 1.0:
                 self.loop_start = timeit.default_timer()
                 self.state = "press"
                 self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)

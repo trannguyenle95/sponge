@@ -104,8 +104,7 @@ def write_metrics_to_h5(num_envs,h5_file_path, sponge_fsms):
     if not os.path.exists(h5_file_name):
         print("Writing to new file", h5_file_name)
         os.makedirs(os.path.dirname(h5_file_name), exist_ok=True)
-        with h5py.File(h5_file_name, "w") as hf:
-
+        with h5py.File(h5_file_name, "w") as hf:            
             # Position and force on each node of sponge when reaching the desired force
             hf.create_dataset("sponge_position_at_force",
                               (num_envs, sponge_fsms[0].state_tensor_length, 3),

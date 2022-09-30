@@ -23,6 +23,7 @@ Simulate indentations of the BioTac sensor with 8 different indenters for a samp
 
 Extracts net force vectors, nodal coordinates, and optionally, element-wise stresses for the BioTac.
 """
+from ast import arg
 import re
 import argparse
 import copy
@@ -44,22 +45,25 @@ from utils import data_utils
 from utils import spongefsm
 from utils import open3d_utils
 import numpy as np
+from distutils.util import strtobool
+
 np.set_printoptions(threshold=np.inf)
 # Set target indenter pose
 RESULTS_DIR = "results/"
-RESULTS_STORAGE_TAG = "_local"
+RESULTS_STORAGE_TAG = "_all"
 def main():
     parser = argparse.ArgumentParser()
+    parser.register('type', 'boolean', strtobool) #to help deal with problem bool("False")=True
     parser.add_argument('--object', required=True, help="Name of object")
     parser.add_argument('--density', default=100, type=float, help="Density")
-    parser.add_argument('--elast_mod', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
+    parser.add_argument('--youngs', default=1000, type=float, help="Elastic modulus of BioTac [Pa]")
     parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of BioTac")
-    parser.add_argument('--extract_stress', default=False, type=bool, help='Extract stress at each indentation step (will reduce simulation speed)')
+    parser.add_argument('--extract_stress', default=False, type='boolean', help='Extract stress at each indentation step (will reduce simulation speed)')
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
-    parser.add_argument('--random_force', default=True, type=bool, help='Random the pressing force of the gripper')
-    parser.add_argument('--random_rotation', default=True, type=bool, help='Random the rotation of the gripper')
-    parser.add_argument('--run_headless', default=False, type=bool, help='Run the simulator headless mode, i.e., no graphical interface')
-    parser.add_argument('--export_results', default=True, type=bool, help='Export results to H5')
+    parser.add_argument('--random_force', default=True, type='boolean', help='Random the rotation of the gripper')
+    parser.add_argument('--random_rotation', default=True, type='boolean', help='Random the rotation of the gripper')
+    parser.add_argument('--run_headless', default=False, type='boolean', help='Run the simulator headless mode, i.e., no graphical interface')
+    parser.add_argument('--write_results', default=True, type='boolean', help='Export results to H5')
 
     args = parser.parse_args()
     target_name = [args.object]
@@ -68,12 +72,11 @@ def main():
     state = "capture_target_pc"
     # Define sim parameters and create Sim object
     sim = create_sim(gym=gym)
-
     # Define and load assets
     asset_options = set_asset_options()
     biotac_urdf_dir = os.path.join('urdf', 'biotac', 'shell_core')
     sim_utils.set_biotac_matl_props(base_dir=biotac_urdf_dir,
-                          elast_mod=args.elast_mod,
+                          elast_mod=args.youngs,
                           poiss_ratio=args.poiss_ratio,
                           density=args.density)
     asset_handles_biotac = load_assets(gym=gym,
@@ -83,7 +86,7 @@ def main():
                                        options=asset_options)
 
     target_list  = target_name * args.num_envs
-    asset_options.thickness = 0.005 #0.005
+    asset_options.thickness = 0.006 #0.005 
     asset_handles_indenters = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'indenters'),
@@ -113,6 +116,7 @@ def main():
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
+    print("Running for object: ", "-- Youngs: ", args.youngs, "--random_force: ",args.random_force, "--random rotation: ", args.random_rotation)
     for i in range(len(env_handles)):
         if args.random_force:       
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
@@ -128,7 +132,7 @@ def main():
                                 target_object_name=target_name[0],
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,random.randint(5, 70),0.0]),
+                                press_force=np.array([0.0,random.randint(1, 25),0.0]),
                                 show_contacts=True)
         elif not args.random_force:
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
@@ -144,7 +148,7 @@ def main():
                                 target_object_name=target_name[0],
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,20.0,0.0]),
+                                press_force=np.array([0.0,5.0,0.0]),
                                 show_contacts=True)
         sponge_fsms.append(sponge_fsm)
     all_done = False
@@ -183,22 +187,23 @@ def main():
     print("Finished the simulation")
 
     # Store data     
-    if args.export_results:
+    if args.write_results:
         regex = re.compile(r'\d+')
         num_iter = 0
         object_name = target_name[0]
-        folder_name = object_name + RESULTS_STORAGE_TAG
+        big_folder_name = object_name + RESULTS_STORAGE_TAG
+        small_folder_name = object_name + "_" + str(args.youngs)
         file_idxes = []
-        os.makedirs(os.path.join(RESULTS_DIR, folder_name), exist_ok=True)
-        if os.listdir(os.path.join(RESULTS_DIR, folder_name)):
-            for file in os.listdir(os.path.join(RESULTS_DIR, folder_name)):
+        os.makedirs(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name), exist_ok=True)
+        if os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
+            for file in os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
                 file_idx = int(regex.search(file).group(0)) #extract number from file name
                 file_idxes.append(file_idx)
             num_iter = max(file_idxes)+1
         else:
             num_iter = 0
         object_file_name = object_name +  "_iter"+"_"+str(num_iter)+".h5"
-        h5_file_path = os.path.join(RESULTS_DIR, folder_name, object_file_name)
+        h5_file_path = os.path.join(RESULTS_DIR, big_folder_name, small_folder_name, object_file_name)
         data_utils.write_metrics_to_h5(num_envs=len(env_handles),h5_file_path=h5_file_path,sponge_fsms=sponge_fsms)
     
 
@@ -270,10 +275,11 @@ def create_sim(gym):
     sim_params.flex.warm_start = 0.1
     sim_params.flex.shape_collision_distance = 5e-4
     sim_params.flex.contact_regularization = 1.0e-6
-    sim_params.flex.shape_collision_margin = 1.0e-4    
+    sim_params.flex.shape_collision_margin = 1.0e-4  
+  
     sim_params.flex.deterministic_mode = True    
 
-    sim_params.flex.friction_mode = 0  # Friction about all 3 axes (including torsional)
+    sim_params.flex.friction_mode = 2  # Friction about all 3 axes (including torsional)
     sim_params.flex.dynamic_friction = 1000
     sim_params.flex.static_friction = 1000
 

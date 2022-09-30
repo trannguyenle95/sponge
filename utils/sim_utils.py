@@ -112,7 +112,7 @@ def get_force_based_torque(F_des, F_curr,moving_average,torque_des):
 
         # Kp = self.cfg['force_control']['Kp']
         # min_torque = self.cfg['force_control']['min_torque']
-        Kp =  0.5
+        Kp =  0.25
         min_torque = -0.005
         # torque_des[0] -= min(total_F_err * Kp, 3 * Kp)
         # torque_des[0] = min(min_torque, torque_des[0])
