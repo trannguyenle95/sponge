@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
     parser.add_argument('--random_force', default=True, type='boolean', help='Random the rotation of the gripper')
     parser.add_argument('--random_rotation', default=True, type='boolean', help='Random the rotation of the gripper')
+    parser.add_argument('--random_youngs', default=False, type='boolean', help='Random the youngs modulus of the sponge')
     parser.add_argument('--run_headless', default=False, type='boolean', help='Run the simulator headless mode, i.e., no graphical interface')
     parser.add_argument('--write_results', default=True, type='boolean', help='Export results to H5')
 
@@ -56,8 +57,12 @@ def main():
     # Define and load assets
     asset_options = set_asset_options()
     sponge_urdf_dir = os.path.join('urdf', 'sponge')
+    if not(bool(args.random_youngs)):
+        youngs = args.youngs
+    else:
+        youngs = random.choice([1000, 5000, 10000, 50000, 100000])
     sim_utils.set_sponge_matl_props(base_dir=sponge_urdf_dir,
-                          elast_mod=args.youngs,
+                          elast_mod=youngs,
                           poiss_ratio=args.poiss_ratio,
                           density=args.density)
     asset_handles_sponge = load_assets(gym=gym,
@@ -90,14 +95,10 @@ def main():
         axes_geom = None
     # Setup cameras
     cam_handles,cam_props = sim_utils.setup_cam(gym, env_handles, scene_props)
-    # Define controller for targetobjects
-    # set_ctrl_props(gym=gym,
-    #                envs=env_handles,
-    #                targetobjects=actor_handles_sponges)    
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
-    print("Running for object: ", "-- Youngs: ", args.youngs, "--random_force: ",args.random_force, "--random rotation: ", args.random_rotation)
+    print("Running for object: ", "-- Youngs: ", youngs, "--random_force: ",args.random_force, "--random rotation: ", args.random_rotation,"--random youngs: ", args.random_youngs)
     for i in range(len(env_handles)):
         if args.random_force:       
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
@@ -113,7 +114,7 @@ def main():
                                 target_object_name=target_name[0],
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,random.randint(1, 25),0.0]),
+                                press_force=np.array([0.0,random.randint(1, 30),0.0]),
                                 show_contacts=True)
         elif not args.random_force:
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
@@ -173,7 +174,7 @@ def main():
         num_iter = 0
         object_name = target_name[0]
         big_folder_name = object_name + RESULTS_STORAGE_TAG
-        small_folder_name = object_name + "_" + str(int(args.youngs))
+        small_folder_name = object_name + "_" + str(int(youngs))
         file_idxes = []
         os.makedirs(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name), exist_ok=True)
         if os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):

@@ -27,25 +27,19 @@ class SpongeFsm:
         """Initialize attributes of grasp evaluation FSM.
 
         Args:
-            gym_handle (gymapi.Gym): Gym object.
-            sim_handle (gymapi.Sim): Simulation object.
-            env_handles (list of gymapi.Env): List of all environments.
-            franka_handle (int): Handle of Franka panda hand actor.
-            platform_handle (int): Handle of support plane actor.
-            state (str): Name of initial FSM state.
-            object_cof (float): Coefficient of friction.
-            f_errs (np.ndarray): Array to track most recent window of contact force errors.
-            grasp_transform (isaacgym.gymapi.Transform): Initial pose of Franka panda hand.
-            obj_name (str): Name of object to be grasped.
+            gym (gymapi.Gym): Gym object.
+            sim (gymapi.Sim): Simulation object.
+            envs (list of gymapi.Env): List of all environments.
             env_id (int): Index of environment from env_handles.
-            hand_origin (gymapi.Transform): Pose of the hand origin (at its base).
+            cam_handles : Handle of cameras.
+            cam_props: Properties of cameras.
+            sponge_actor: Sponge actor.
             viewer (gymapi.Viewer): Graphical display object.
-            envs_per_row (int): Number of environments to be placed in a row.
-            env_dim (float): Size of each environment.
-            youngs (str): Elastic modulus of the object, eg '3e5'.
-            density (str): Density of the object, eg. '1000'.
-            directions (np.ndarray): Array of directions to be evaluated in this env.
-            mode (str): Name of grasp test {'pickup', 'reorient', 'shake', 'twist'}.
+            state: current state of the system {'init', 'approach', 'press', 'done'}.
+            target_object_name (str): Name of object to be pressed.
+            gripper_ori: Orientation of the sponge in euler angle (y axis up).
+            press_loc: press location
+            show_contacts: contacts visualization.
         """
         # Simulation handles
         self.started = False
@@ -135,7 +129,7 @@ class SpongeFsm:
             # print("pressing")
             # =================================================
             # Process finger grasp forces with LP filter and moving average
-            if (timeit.default_timer() - self.loop_start) < 15:
+            if (timeit.default_timer() - self.loop_start) < 20:
                 self.F_curr = data_utils.extract_net_forces(self.gym,self.sim)  
                 self.F_history.append(np.sum(self.F_curr[1:]))
                 window = self.F_history[-self.F_max_window_size:]
