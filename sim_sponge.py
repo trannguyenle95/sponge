@@ -4,6 +4,7 @@
 Simulate a deformable sponge pressing on different targetobjects.
 
 """
+import sys
 from ast import arg
 import re
 import argparse
@@ -151,6 +152,7 @@ def main():
             if sponge_fsms[i].state != "done":
                 sponge_fsms[i].run_state_machine()
             print("State env ", str(i), "---- state: ",sponge_fsms[i].state, "----- force: ", sponge_fsms[i].F_des[1])
+        sys.stdout.write("\033["+str(len(env_handles))+"A") # Cursor up n line
 
         # Run simulation
         gym.simulate(sim)
@@ -170,6 +172,7 @@ def main():
     if not args.run_headless:
         gym.destroy_viewer(viewer)
     gym.destroy_sim(sim)
+    sys.stdout.write("\033["+str(len(env_handles))+"B") # Cursor down n line
     print("Finished the simulation")
 
     # Store data     

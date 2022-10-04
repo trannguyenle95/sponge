@@ -107,7 +107,7 @@ class SpongeFsm:
                 target_pcd.points = open3d.utility.Vector3dVector(np.array(object_pc))
                 open3d.io.write_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd", target_pcd)
             else:
-                print("Target object point cloud existed.")
+                print("Target object point cloud existed.",end="\r")
             self.state = "approach"
             self.approach_start = timeit.default_timer()
 
@@ -118,8 +118,6 @@ class SpongeFsm:
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
             if np.abs(F_curr[1]) < 1 and (timeit.default_timer() - self.approach_start) < 45:
-                print(timeit.default_timer() - self.approach_start)
-
                 if self.target_object_name in ["square_pot"]:
                     vel_des = -0.06
                 else:
@@ -142,7 +140,6 @@ class SpongeFsm:
                 self.state = "failed"
 
         elif self.state == "press":
-            # print("pressing")
             # =================================================
             # Process finger grasp forces with LP filter and moving average
             if (timeit.default_timer() - self.loop_start) < 30:
@@ -171,7 +168,7 @@ class SpongeFsm:
                     self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
                     self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
 
-                print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])))
+                print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1]))," **** ",end=" ")
                 if  np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])) < np.abs(0.1 * self.F_des[1]):
                     self.pressed_forces = data_utils.extract_net_forces(self.gym,self.sim)[self.env_id][1] 
                     self.state = "capture_final_state"
@@ -194,7 +191,6 @@ class SpongeFsm:
             target_pcd = open3d.io.read_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd")
             open3d_utils.visualize_pc_open3d(target_pcd+pcd)
             self.press_locations = self.press_locations_buffer
-            print(self.press_locations)
             self.action_success = True
             self.state = "done"                
         return
