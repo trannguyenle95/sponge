@@ -100,7 +100,11 @@ def main():
     sponge_fsms = []
     print("Running for object: ", "-- Youngs: ", youngs, "--random_force: ",args.random_force, "--random rotation: ", args.random_rotation,"--random youngs: ", args.random_youngs)
     for i in range(len(env_handles)):
-        if args.random_force:       
+        if args.random_force:
+            if youngs in [1000,5000]:
+                f_y_desired = random.randint(1, 15)
+            else:
+                f_y_desired = random.randint(1, 30)
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
                                 sim=sim, 
                                 envs=env_handles, 
@@ -114,7 +118,7 @@ def main():
                                 target_object_name=target_name[0],
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,random.randint(1, 30),0.0]),
+                                press_force=np.array([0.0,f_y_desired,0.0]),
                                 show_contacts=True)
         elif not args.random_force:
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 

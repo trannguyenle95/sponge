@@ -91,6 +91,14 @@ class SpongeFsm:
         # pcd = open3d.geometry.PointCloud()
         # pcd.points = open3d.utility.Vector3dVector(np.array(sponge_state_init_array))
         # open3d.io.write_point_cloud("/home/trannguyenle/test.pcd", pcd)
+        if self.state == "failed":
+            self.action_success = False
+            self.sponge_position_at_force = np.zeros((self.state_tensor_length,3))
+            self.normal_forces_on_nodes = np.zeros((self.state_tensor_length,3))
+            self.contact_indexes = np.zeros((self.state_tensor_length))
+            self.press_locations = np.zeros((1,3))
+            self.pressed_forces = 0
+            self.state = "done"
 
         if self.state == "capture_target_pc":
             if not os.path.exists(target_object_pc_file):
@@ -101,15 +109,21 @@ class SpongeFsm:
             else:
                 print("Target object point cloud existed.")
             self.state = "approach"
+            self.approach_start = timeit.default_timer()
+
 
         elif self.state == "approach":
             targetobject_dof_state = self.gym.get_actor_dof_states(self.env, self.sponge_actor, gymapi.STATE_ALL)
             targetobject_dof_pos = targetobject_dof_state['pos']
             F_curr_all_env = data_utils.extract_net_forces(self.gym,self.sim)  
             F_curr = F_curr_all_env[self.env_id]
-            self.approach_start = timeit.default_timer()
-            if np.abs(F_curr[1]) < 1 and (timeit.default_timer() - self.approach_start) < 10:
-                vel_des = -0.03
+            if np.abs(F_curr[1]) < 1 and (timeit.default_timer() - self.approach_start) < 45:
+                print(timeit.default_timer() - self.approach_start)
+
+                if self.target_object_name in ["square_pot"]:
+                    vel_des = -0.06
+                else:
+                    vel_des = -0.03
                 # if targetobject_dof_pos < -0.34:
                 #     vel_des = -0.02  
 
@@ -119,17 +133,19 @@ class SpongeFsm:
                 self.gym.set_actor_dof_properties(self.env,self.sponge_actor,dof_props)
 
                 self.gym.set_actor_dof_velocity_targets(self.env,self.sponge_actor,vel_des)
-            elif np.abs(F_curr[1]) > 1.0:
+            elif np.abs(F_curr[1]) > 1:
                 self.loop_start = timeit.default_timer()
                 self.state = "press"
                 self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
                 self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
+            elif (timeit.default_timer() - self.approach_start) > 45:
+                self.state = "failed"
 
         elif self.state == "press":
             # print("pressing")
             # =================================================
             # Process finger grasp forces with LP filter and moving average
-            if (timeit.default_timer() - self.loop_start) < 20:
+            if (timeit.default_timer() - self.loop_start) < 30:
                 self.F_curr = data_utils.extract_net_forces(self.gym,self.sim)  
                 self.F_history.append(np.sum(self.F_curr[1:]))
                 window = self.F_history[-self.F_max_window_size:]
@@ -156,19 +172,11 @@ class SpongeFsm:
                     self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
 
                 print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])))
-                if  np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])) < np.abs(0.05 * self.F_des[1]):
+                if  np.abs(np.abs(self.F_curr[self.env_id][1])-np.abs(self.F_des[1])) < np.abs(0.1 * self.F_des[1]):
                     self.pressed_forces = data_utils.extract_net_forces(self.gym,self.sim)[self.env_id][1] 
                     self.state = "capture_final_state"
-            else: #Fail state
-                self.action_success = False
-                self.sponge_position_at_force = np.zeros((self.state_tensor_length,3))
-                self.normal_forces_on_nodes = np.zeros((self.state_tensor_length,3))
-                self.contact_indexes = np.zeros((self.state_tensor_length))
-                self.press_locations = np.zeros((1,3))
-                print("test: ",self.press_locations)
-
-                self.pressed_forces = 0
-                self.state = "done"
+            else: 
+                self.state = "failed"
 
         elif self.state == "capture_final_state":
             deformed_state = gymtorch.wrap_tensor(self.gym.acquire_particle_state_tensor(self.sim))

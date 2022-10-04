@@ -25,7 +25,7 @@ def sample_points_and_normals_from_pcd(file_path, number_of_points):
         epsilon = 0.055 #0.05
         randomRows_idxs = sample(range(points.shape[0]), number_of_points)
     else:
-        epsilon = 0.08
+        epsilon = 0.1
         y_normal_idxs = np.where(np.isclose(points_normals[:,1], 1))
         not_y_normal_idxs= np.setdiff1d(range(points.shape[0]),y_normal_idxs)
         x_normal_idxs = np.where(np.isclose(points_normals[:,0], -1))

@@ -36,7 +36,7 @@ def setup_cam(gym, envs, props):
     cam_prop = gymapi.CameraProperties()
     cam_prop.width = 300
     cam_prop.height = 300 
-    cam_position = gymapi.Vec3(0.0, 0.18, 0.001) #x ngang, y cao, z nhin xa
+    cam_position = gymapi.Vec3(0.0, 0.3, 0.001) #x ngang, y cao, z nhin xa
     cam_target = gymapi.Vec3(0.0, 0.0, 0.0)
     cam_handles = []
     cam_props = []
