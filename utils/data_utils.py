@@ -2,6 +2,7 @@ import numpy as np
 import os
 import h5py 
 from isaacgym import gymapi
+from colorama import Fore,Style
 
 def extract_nodal_coords(gym, sim, particle_states):
     """Extract the nodal coordinates (state) for the sponge from each environment."""
@@ -99,10 +100,11 @@ def extract_elem_stresses(gym, sim, envs):
 def write_metrics_to_h5(num_envs,h5_file_path, sponge_fsms):
     """Write metrics and features to h5 result file."""
     h5_file_name = h5_file_path
-    print("Trying to write to", h5_file_name)
+    print(Fore.GREEN + "Trying to write to", h5_file_name)
 
     if not os.path.exists(h5_file_name):
         print("Writing to new file", h5_file_name)
+        print(Style.RESET_ALL)
         os.makedirs(os.path.dirname(h5_file_name), exist_ok=True)
         with h5py.File(h5_file_name, "w") as hf:            
             # Position and force on each node of sponge when reaching the desired force

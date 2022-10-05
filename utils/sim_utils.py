@@ -1,4 +1,3 @@
-from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 from copy import deepcopy
@@ -113,7 +112,7 @@ def get_force_based_torque(F_des, F_curr,moving_average,torque_des):
         # Kp = self.cfg['force_control']['Kp']
         # min_torque = self.cfg['force_control']['min_torque']
         Kp =  0.25
-        min_torque = -0.005
+        min_torque = -0.01 #was half
         # torque_des[0] -= min(total_F_err * Kp, 3 * Kp)
         # torque_des[0] = min(min_torque, torque_des[0])
         torque_des[1] -= min(total_F_err * Kp, 3 * Kp)

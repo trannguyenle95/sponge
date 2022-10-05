@@ -4,6 +4,7 @@
 Simulate a deformable sponge pressing on different targetobjects.
 
 """
+from colorama import Fore,Style
 import sys
 from ast import arg
 import re
@@ -28,7 +29,6 @@ from utils import spongefsm
 from utils import open3d_utils
 import numpy as np
 from distutils.util import strtobool
-
 np.set_printoptions(threshold=np.inf)
 # Set target targetobject pose
 RESULTS_DIR = "results/"
@@ -99,7 +99,8 @@ def main():
     # Run simulation loop
     state = 'init'
     sponge_fsms = []
-    print("Running for object: ", "-- Youngs: ", youngs, "--random_force: ",args.random_force, "--random rotation: ", args.random_rotation,"--random youngs: ", args.random_youngs)
+    print(Fore.GREEN + "Running for object: ", str(target_name[0]), "-- Youngs:", youngs, "-- random_force:",args.random_force, "-- random_rotation:", args.random_rotation,"-- random_youngs:", bool(args.random_youngs))
+    print(Style.RESET_ALL)
     for i in range(len(env_handles)):
         if args.random_force:
             if youngs in [1000,5000]:
@@ -151,7 +152,7 @@ def main():
         for i in range(len(env_handles)):
             if sponge_fsms[i].state != "done":
                 sponge_fsms[i].run_state_machine()
-            print("State env ", str(i), "---- state: ",sponge_fsms[i].state, "----- force: ", sponge_fsms[i].F_des[1])
+            print(Fore.YELLOW + "State env ", str(i), "---- state: ",sponge_fsms[i].state, "----- force: ", sponge_fsms[i].F_des[1])
         sys.stdout.write("\033["+str(len(env_handles))+"A") # Cursor up n line
 
         # Run simulation
@@ -173,7 +174,8 @@ def main():
         gym.destroy_viewer(viewer)
     gym.destroy_sim(sim)
     sys.stdout.write("\033["+str(len(env_handles))+"B") # Cursor down n line
-    print("Finished the simulation")
+    print(Style.RESET_ALL)
+    print(f"{Fore.GREEN}Finished the simulation{Style.RESET_ALL}")
 
     # Store data     
     if args.write_results:
@@ -205,7 +207,11 @@ def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjec
     env_handles = []
     actor_handles_sponges = []
     actor_handles_targetobjects = []
-    target_object_pcd_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+object_name+".pcd"
+    
+    # Load target object point cloud 
+    target_object_pcd_file_name = "target_object_pc/"+object_name+".pcd"
+    target_object_pcd_file = os.path.join(os.path.abspath(os.getcwd()),target_object_pcd_file_name)
+
     if os.path.exists(target_object_pcd_file):
         sampled_points_real, sampled_points_approach , sampled_points_normals, sampled_points_normals_euler = open3d_utils.sample_points_and_normals_from_pcd(target_object_pcd_file,props['num_envs'])
     else:

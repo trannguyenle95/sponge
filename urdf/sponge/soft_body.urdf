@@ -42,7 +42,7 @@
 		<fem>
             <origin rpy="0.0 0.0 0.0" xyz="0 0.0 0" />
             <density value="100"/>
-			<youngs value="10000"/>
+			<youngs value="1000"/>
 			<poissons value="0.45"/>
 			<damping value="0"/>
 			<attachDistance value="0.01"/>

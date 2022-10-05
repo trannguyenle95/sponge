@@ -77,7 +77,9 @@ class SpongeFsm:
         results = []
         allpcs = []
         ctr_pos = 0.0
-        target_object_pc_file = "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd"
+        target_object_pcd_file_name = "target_object_pc/"+str(self.target_object_name)+".pcd"
+        target_object_pcd_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),target_object_pcd_file_name)
+
         if self.state == "init":
             self.started = True
             self.state = "capture_target_pc"
@@ -101,11 +103,11 @@ class SpongeFsm:
             self.state = "done"
 
         if self.state == "capture_target_pc":
-            if not os.path.exists(target_object_pc_file):
+            if not os.path.exists(target_object_pcd_file):
                 object_pc = sim_utils.get_partial_point_cloud(self.gym, self.sim, self.env, self.cam_handles, self.cam_props, visualization=False)
                 target_pcd = open3d.geometry.PointCloud()
                 target_pcd.points = open3d.utility.Vector3dVector(np.array(object_pc))
-                open3d.io.write_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd", target_pcd)
+                open3d.io.write_point_cloud(target_object_pcd_file, target_pcd)
             else:
                 print("Target object point cloud existed.",end="\r")
             self.state = "approach"
@@ -162,8 +164,7 @@ class SpongeFsm:
                 self.gym.apply_dof_effort(self.env,
                                         self.sponge_actor,
                                         self.torque_des_force[1])
-                # print("Error evn ",int(self.env_id), " ---- ",np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])))
-                # if  np.abs(np.abs(self.torque_des_force[1])-np.abs(self.F_des[1])) < np.abs(0.05 * self.F_des[1]):
+
                 if self.show_contacts:
                     self.gym.draw_env_rigid_contacts(self.viewer, self.env, gymapi.Vec3(1.0, 0.5, 0.0), 0.05, True)
                     self.gym.draw_env_soft_contacts(self.viewer, self.env, gymapi.Vec3(0.6, 0.0, 0.6), 0.05, False, True)
@@ -188,7 +189,7 @@ class SpongeFsm:
             self.contact_indexes = contact_indexes[self.env_id]
             pcd = open3d.geometry.PointCloud()
             pcd.points = open3d.utility.Vector3dVector(np.array(self.deformed_state_all_envs[self.env_id]))
-            target_pcd = open3d.io.read_point_cloud("/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/target_object_pc/"+str(self.target_object_name)+".pcd")
+            target_pcd = open3d.io.read_point_cloud(target_object_pcd_file)
             open3d_utils.visualize_pc_open3d(target_pcd+pcd)
             self.press_locations = self.press_locations_buffer
             self.action_success = True
