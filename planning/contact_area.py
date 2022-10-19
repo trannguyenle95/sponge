@@ -7,6 +7,8 @@ import sys
 sys.path.insert(1, '../utils')  # caution: path[0] is reserved for script path (or '' in REPL)
 import open3d_utils
 from descartes import PolygonPatch
+from matplotlib.patches import Rectangle
+
 import alphashape
 import matplotlib.pyplot as plt
 import matplotlib
@@ -53,12 +55,19 @@ def main():
             # axs[0,env_id].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, cmap=cmap, norm=norm)
             axs[0,env_id].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
             axs[0,env_id].set_title('F = ' + str(pressed_forces[env_id])+ " - A = "+str(format(float(alpha_shape.area),".5f")))
-
+            axs[0,env_id].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
+                        edgecolor = 'pink',
+                        fill=False,
+                        lw=2))
         else:
             axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, vmin=0, vmax=2.8, cmap='Greens')
             # axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered,cmap=cmap, norm=norm)
             axs[1,env_id-5].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
             axs[1,env_id-5].set_title('F = ' + str(pressed_forces[env_id]) + " - A = "+str(format(float(alpha_shape.area),".5f")))
+            axs[1,env_id-5].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
+                        edgecolor = 'pink',
+                        fill=False,
+                        lw=2))
         print(env_id, alpha_shape.bounds)
     plt.show()
 
