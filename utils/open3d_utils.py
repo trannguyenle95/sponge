@@ -1,8 +1,8 @@
 from random import sample
 import numpy as np
 from copy import deepcopy
-from isaacgym import gymtorch
-from isaacgym import gymapi
+# from isaacgym import gymtorch
+# from isaacgym import gymapi
 import open3d
 from scipy.signal import butter, filtfilt
 from scipy.spatial.transform import Rotation as R

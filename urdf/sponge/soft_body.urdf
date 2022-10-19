@@ -41,9 +41,9 @@
 	<link name="soft_object">
 		<fem>
             <origin rpy="0.0 0.0 0.0" xyz="0 0.0 0" />
-            <density value="100"/>
-			<youngs value="1000"/>
-			<poissons value="0.45"/>
+            <density value="1000"/>
+			<youngs value="10000"/>
+			<poissons value="0.35"/>
 			<damping value="0"/>
 			<attachDistance value="0.01"/>
 			<tetmesh filename="../../meshes/sponge/sponge_more_node.tet"/>

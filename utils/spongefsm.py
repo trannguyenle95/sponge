@@ -102,7 +102,7 @@ class SpongeFsm:
             self.pressed_forces = 0
             self.state = "done"
 
-        if self.state == "capture_target_pc":
+        elif self.state == "capture_target_pc":
             if not os.path.exists(target_object_pcd_file):
                 object_pc = sim_utils.get_partial_point_cloud(self.gym, self.sim, self.env, self.cam_handles, self.cam_props, visualization=False)
                 target_pcd = open3d.geometry.PointCloud()

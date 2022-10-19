@@ -37,11 +37,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.register('type', 'boolean', strtobool) #to help deal with problem bool("False")=True
     parser.add_argument('--object', required=True, help="Name of object")
-    parser.add_argument('--density', default=100, type=float, help="Density")
-    parser.add_argument('--youngs', default=1000, type=float, help="Elastic modulus of the sponge [Pa]")
-    parser.add_argument('--poiss_ratio', default=0.45, type=float, help="Poisson's ratio of sponge")
+    parser.add_argument('--density', default=1000, type=float, help="Density")
+    parser.add_argument('--youngs', default=10000, type=float, help="Elastic modulus of the sponge [Pa]")
+    parser.add_argument('--poiss_ratio', default=0.35, type=float, help="Poisson's ratio of sponge") #0.45 good
     parser.add_argument('--extract_stress', default=False, type='boolean', help='Extract stress at each indentation step (will reduce simulation speed)')
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
+    parser.add_argument('--increment_force', default=False, type='boolean', help='Increment the force of the gripper')
     parser.add_argument('--random_force', default=True, type='boolean', help='Random the rotation of the gripper')
     parser.add_argument('--random_rotation', default=True, type='boolean', help='Random the rotation of the gripper')
     parser.add_argument('--random_youngs', default=False, type='boolean', help='Random the youngs modulus of the sponge')
@@ -73,7 +74,7 @@ def main():
                                        options=asset_options)
 
     target_list  = target_name * args.num_envs
-    asset_options.thickness = 0.006 #0.005 to avoid interpenetration
+    asset_options.thickness = 0.005 #0.005 to avoid interpenetration
     asset_handles_targetobjects = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'targetobjects'),
@@ -102,7 +103,7 @@ def main():
     print(Fore.GREEN + "Running for object: ", str(target_name[0]), "-- Youngs:", youngs, "-- random_force:",args.random_force, "-- random_rotation:", args.random_rotation,"-- random_youngs:", bool(args.random_youngs))
     print(Style.RESET_ALL)
     for i in range(len(env_handles)):
-        if args.random_force:
+        if args.random_force and not(args.increment_force):
             if youngs in [1000,5000]:
                 f_y_desired = random.randint(1, 15)
             else:
@@ -122,7 +123,7 @@ def main():
                                 press_loc=press_loc[i],
                                 press_force=np.array([0.0,f_y_desired,0.0]),
                                 show_contacts=True)
-        elif not args.random_force:
+        elif not args.random_force and not(args.increment_force):
             sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
                                 sim=sim, 
                                 envs=env_handles, 
@@ -137,6 +138,23 @@ def main():
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
                                 press_force=np.array([0.0,5.0,0.0]),
+                                show_contacts=True)
+        elif args.increment_force:
+            f_y_desired_envs = np.linspace(1.0,25.0,num=len(env_handles))
+            sponge_fsm = spongefsm.SpongeFsm(gym=gym, 
+                                sim=sim, 
+                                envs=env_handles, 
+                                env_id = i,
+                                cam_handles=cam_handles[i],
+                                cam_props = cam_props[i],
+                                sponge_actor=actor_handles_sponges,
+                                viewer=viewer,
+                                axes=axes_geom,
+                                state=state,
+                                target_object_name=target_name[0],
+                                gripper_ori=gripper_rotation_with_random_z[i],
+                                press_loc=press_loc[i],
+                                press_force=np.array([0.0,f_y_desired_envs[i],0.0]),
                                 show_contacts=True)
         sponge_fsms.append(sponge_fsm)
     all_done = False
@@ -198,7 +216,7 @@ def main():
         data_utils.write_metrics_to_h5(num_envs=len(env_handles),h5_file_path=h5_file_path,sponge_fsms=sponge_fsms)
     
 
-def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjects, sponge_offset=0.2, targetobject_offset=0.05,random_rotation=False):
+def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjects, sponge_offset=0.1, targetobject_offset=0.05,random_rotation=False):
     """Create a scene (i.e., ground plane, environments, BioTac actors, and targetobject actors)."""
     z_angle = 0
     plane_params = gymapi.PlaneParams()
@@ -227,14 +245,19 @@ def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjec
         pose = gymapi.Transform()
         collision_group = i
         collision_filter = 0
-        # pose.p = gymapi.Vec3(sampled_points[i][0], sponge_offset, sampled_points[i][2])
-        pose.p = gymapi.Vec3(sampled_points_approach[i][0], sampled_points_approach[i][1], sampled_points_approach[i][2])
-
         if random_rotation:
-            z_angle = random.randint(-90, 90)
+                z_angle = random.randint(-90, 90)
         elif not random_rotation:
-            z_angle = 0    
-        gripper_rotation_per_env = np.array([sampled_points_normals_euler[i][0],z_angle,sampled_points_normals_euler[i][2]])
+            z_angle = 0   
+
+        if object_name in ['platform']:
+            pose.p = gymapi.Vec3(0.0, sponge_offset, 0.0)
+            gripper_rotation_per_env = np.array([0,0,0])
+        else:
+            pose.p = gymapi.Vec3(sampled_points_approach[i][0], sampled_points_approach[i][1], sampled_points_approach[i][2])
+            gripper_rotation_per_env = np.array([sampled_points_normals_euler[i][0],z_angle,sampled_points_normals_euler[i][2]])
+
+       
         r = R.from_euler('XYZ',gripper_rotation_per_env, degrees=True)
         gripper_rotation_with_random_z.append(gripper_rotation_per_env)
         quat = r.as_quat()
