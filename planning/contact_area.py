@@ -26,7 +26,7 @@ def main():
     ### Result file
     big_folder_name = object_name + RESULTS_STORAGE_TAG
     small_folder_name = object_name + "_" + str(int(args.youngs))
-    object_file_name = object_name +  "_iter"+"_"+"2"+".h5"
+    object_file_name = object_name +  "_iter"+"_"+"3"+".h5"
     h5_file_path = os.path.join(RESULTS_DIR, big_folder_name, small_folder_name, object_file_name)
     ### Load target object point cloud 
     target_object_pcd_file_name = "target_object_pc/"+str(object_name)+".pcd"
@@ -45,29 +45,35 @@ def main():
         contact_points_loc = sponge_position_at_force[env_id][mask, :]
         normal_forces_on_nodes_filtered = np.sum(normal_forces_on_nodes[env_id][mask,:],axis=1)
         # normal_forces_on_nodes_filtered *= 10 #for plot
+        force_per_node_threshold = 0.05
+        mask_force = normal_forces_on_nodes_filtered > force_per_node_threshold
+        contact_points_loc_filtered = contact_points_loc[mask_force,:]
+        normal_forces_on_nodes_filtered = normal_forces_on_nodes_filtered[normal_forces_on_nodes_filtered>force_per_node_threshold]
 
-        contact_points_loc_2D = np.delete(contact_points_loc, 1, 1)
+        contact_points_loc_2D = np.delete(contact_points_loc_filtered, 1, 1)
         alpha_shape = alphashape.alphashape(contact_points_loc_2D.tolist(), 0.)
         cmap = matplotlib.cm.cool
         norm = matplotlib.colors.Normalize(vmin=0, vmax=3)
-        if env_id <= 4:
-            axs[0,env_id].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, vmin=0, vmax=2.8, cmap='Greens')
-            # axs[0,env_id].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, cmap=cmap, norm=norm)
-            axs[0,env_id].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
-            axs[0,env_id].set_title('F = ' + str(pressed_forces[env_id])+ " - A = "+str(format(float(alpha_shape.area),".5f")))
-            axs[0,env_id].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
-                        edgecolor = 'pink',
-                        fill=False,
-                        lw=2))
+        if contact_points_loc_2D.size < 3:
+            pass
         else:
-            axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, vmin=0, vmax=2.8, cmap='Greens')
-            # axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered,cmap=cmap, norm=norm)
-            axs[1,env_id-5].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
-            axs[1,env_id-5].set_title('F = ' + str(pressed_forces[env_id]) + " - A = "+str(format(float(alpha_shape.area),".5f")))
-            axs[1,env_id-5].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
-                        edgecolor = 'pink',
-                        fill=False,
-                        lw=2))
+            if env_id <= 4:
+                axs[0,env_id].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, vmin=0, vmax=2.8, cmap='Greens')
+                axs[0,env_id].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
+                axs[0,env_id].set_title('F = ' + str(pressed_forces[env_id])+ " - A = "+str(format(float(alpha_shape.area),".5f")))
+                axs[0,env_id].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
+                            edgecolor = 'pink',
+                            fill=False,
+                            lw=2))
+            else:
+                axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered, vmin=0, vmax=2.8, cmap='Greens')
+                # axs[1,env_id-5].scatter(*zip(*contact_points_loc_2D.tolist()),c=normal_forces_on_nodes_filtered,cmap=cmap, norm=norm)
+                axs[1,env_id-5].add_patch(PolygonPatch(alpha_shape, alpha=0.2))
+                axs[1,env_id-5].set_title('F = ' + str(pressed_forces[env_id]) + " - A = "+str(format(float(alpha_shape.area),".5f")))
+                axs[1,env_id-5].add_patch(Rectangle((alpha_shape.bounds[0], alpha_shape.bounds[1]), np.abs(alpha_shape.bounds[0]-alpha_shape.bounds[2]), np.abs(alpha_shape.bounds[1]-alpha_shape.bounds[3]),
+                            edgecolor = 'pink',
+                            fill=False,
+                            lw=2))
         print(env_id, alpha_shape.bounds)
     plt.show()
 
