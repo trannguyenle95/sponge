@@ -42,9 +42,9 @@ def main():
     parser.add_argument('--poiss_ratio', default=0.35, type=float, help="Poisson's ratio of sponge") #0.45 good
     parser.add_argument('--extract_stress', default=False, type='boolean', help='Extract stress at each indentation step (will reduce simulation speed)')
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
-    parser.add_argument('--increment_force', default=False, type='boolean', help='Increment the force of the gripper')
-    parser.add_argument('--random_force', default=False, type='boolean', help='Random the rotation of the gripper')
-    parser.add_argument('--random_rotation', default=True, type='boolean', help='Random the rotation of the gripper')
+    parser.add_argument('--increment_force', default=True, type='boolean', help='Increment the force of the gripper')
+    parser.add_argument('--random_force', default=True, type='boolean', help='Random the rotation of the gripper')
+    parser.add_argument('--random_rotation', default=False, type='boolean', help='Random the rotation of the gripper')
     parser.add_argument('--random_youngs', default=False, type='boolean', help='Random the youngs modulus of the sponge')
     parser.add_argument('--run_headless', default=False, type='boolean', help='Run the simulator headless mode, i.e., no graphical interface')
     parser.add_argument('--write_results', default=True, type='boolean', help='Export results to H5')
@@ -74,7 +74,7 @@ def main():
                                        options=asset_options)
 
     target_list  = target_name * args.num_envs
-    asset_options.thickness = 0.002 #0.005 to avoid interpenetration
+    asset_options.thickness = 0.005 #0.005 to avoid interpenetration
     asset_handles_targetobjects = load_assets(gym=gym,
                                           sim=sim,
                                           base_dir=os.path.join('urdf', 'targetobjects'),
@@ -254,8 +254,8 @@ def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjec
             pose.p = gymapi.Vec3(0.0, sponge_offset, 0.0)
             gripper_rotation_per_env = np.array([0,0,0])
         else:
-            pose.p = gymapi.Vec3(sampled_points_approach[i][0], sampled_points_approach[i][1], sampled_points_approach[i][2])
-            gripper_rotation_per_env = np.array([sampled_points_normals_euler[i][0],z_angle,sampled_points_normals_euler[i][2]])
+            pose.p = gymapi.Vec3(sampled_points_approach[0][0], sampled_points_approach[0][1], sampled_points_approach[0][2])
+            gripper_rotation_per_env = np.array([sampled_points_normals_euler[0][0],z_angle,sampled_points_normals_euler[0][2]])
 
        
         r = R.from_euler('XYZ',gripper_rotation_per_env, degrees=True)

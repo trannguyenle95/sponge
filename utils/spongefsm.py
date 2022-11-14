@@ -190,7 +190,7 @@ class SpongeFsm:
             pcd = open3d.geometry.PointCloud()
             pcd.points = open3d.utility.Vector3dVector(np.array(self.deformed_state_all_envs[self.env_id]))
             target_pcd = open3d.io.read_point_cloud(target_object_pcd_file)
-            open3d_utils.visualize_pc_open3d(target_pcd+pcd)
+            # open3d_utils.visualize_pc_open3d(target_pcd+pcd)
             self.press_locations = self.press_locations_buffer
             self.action_success = True
             self.state = "done"                
