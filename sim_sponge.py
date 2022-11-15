@@ -203,16 +203,20 @@ def main():
         big_folder_name = object_name + RESULTS_STORAGE_TAG
         small_folder_name = object_name + "_" + str(int(youngs))
         file_idxes = []
-        os.makedirs(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name), exist_ok=True)
-        if os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
-            for file in os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
+        # os.makedirs(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name), exist_ok=True)
+        # if os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
+        #     for file in os.listdir(os.path.join(RESULTS_DIR, big_folder_name, small_folder_name)):
+        os.makedirs(os.path.join(RESULTS_DIR, big_folder_name), exist_ok=True)
+        if os.listdir(os.path.join(RESULTS_DIR, big_folder_name)):
+            for file in os.listdir(os.path.join(RESULTS_DIR, big_folder_name)):
                 file_idx = int(regex.search(file).group(0)) #extract number from file name
                 file_idxes.append(file_idx)
             num_iter = max(file_idxes)+1
         else:
             num_iter = 0
         object_file_name = object_name +  "_iter"+"_"+str(num_iter)+".h5"
-        h5_file_path = os.path.join(RESULTS_DIR, big_folder_name, small_folder_name, object_file_name)
+        # h5_file_path = os.path.join(RESULTS_DIR, big_folder_name, small_folder_name, object_file_name)
+        h5_file_path = os.path.join(RESULTS_DIR, big_folder_name, object_file_name)
         data_utils.write_metrics_to_h5(num_envs=len(env_handles),h5_file_path=h5_file_path,sponge_fsms=sponge_fsms)
     
 
