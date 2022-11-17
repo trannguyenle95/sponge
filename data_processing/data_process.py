@@ -13,6 +13,7 @@ from scipy.spatial.distance import cdist
 # Create command line flag options
 parser = argparse.ArgumentParser(description='Options')
 parser.add_argument('--object', required=True, help="Name of object")
+parser.add_argument('--mode', default="write", type=str, help="Density")
 
 args = parser.parse_args()
 object_name = args.object
@@ -58,6 +59,8 @@ if args.mode == "write":
             gripper_ori_all.append(float(gripper_ori[i][:,1]))
     print(sponge_position_at_force_contacted_points_all[0].shape)
     print(target_object_pc_pts.shape)
+    # print((press_locations_all[0] == target_object_pc_pts).all(1).any()) #Check if sampled points is on target pc
+
     # Construct ground-truth label per contact.
     contact_label_all = []
     for i in range(len(sponge_position_at_force_contacted_points_all)):
