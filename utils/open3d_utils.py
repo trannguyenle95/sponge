@@ -37,7 +37,7 @@ def sample_points_and_normals_from_pcd(file_path, number_of_points):
         # if points_normals[i][1] < 0:
         #    points_normals[i] *= -1
         approach_pts = points[i] + epsilon*points_normals[i]
-        # print("pts: ",points[i], " -- normal: ",points_normals[i], "-- approach: ",approach_pts)
+        print("pts: ",points[i], " -- normal: ",points_normals[i], "-- approach: ",approach_pts)
         sampled_points_approach.append(approach_pts)
         rotation = R.align_vectors(points_normals[i].reshape((1,3)),b)
         sampled_points_normals.append(points_normals[i])
