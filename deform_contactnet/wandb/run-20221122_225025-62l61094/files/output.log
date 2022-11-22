@@ -1,0 +1,124 @@
+PARAMETER ...
+Namespace(batch_size=5, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False)
+Load dataset ...
+23
+No existing model, starting training from scratch...
+Epoch 1 (1/200):
+  0%|                                                                                              | 0/3 [00:00<?, ?it/s]
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.4989, 0.4696, 0.4854,  ..., 0.4685, 0.4989, 0.4539],
+        [0.5265, 0.5265, 0.5265,  ..., 0.5155, 0.5265, 0.5265],
+        [0.4964, 0.4775, 0.4964,  ..., 0.4964, 0.5768, 0.5745],
+        [0.5610, 0.5603, 0.5610,  ..., 0.4292, 0.5610, 0.4428],
+        [0.4250, 0.4131, 0.4250,  ..., 0.4258, 0.4250, 0.4250]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.6835, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+Got 25674.0 / 5 with accuracy 513480.0
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.5626, 0.5626, 0.5626,  ..., 0.5626, 0.5626, 0.5626],
+        [0.4605, 0.4605, 0.3206,  ..., 0.4310, 0.4317, 0.4223],
+        [0.5118, 0.5118, 0.5118,  ..., 0.5118, 0.5118, 0.5118],
+        [0.5033, 0.4959, 0.4722,  ..., 0.4975, 0.4970, 0.5033],
+        [0.4905, 0.4905, 0.4905,  ..., 0.4905, 0.4905, 0.4905]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+100%|██████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:08<00:00,  2.93s/it]
+  0%|                                                                                              | 0/3 [00:00<?, ?it/s]
+Got 49148.0 / 10 with accuracy 491480.0
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.3307, 0.3307, 0.3868,  ..., 0.3307, 0.3307, 0.3307],
+        [0.5364, 0.5047, 0.5670,  ..., 0.5071, 0.5087, 0.5364],
+        [0.4368, 0.4368, 0.4368,  ..., 0.4562, 0.4572, 0.4368],
+        [0.3354, 0.4469, 0.4013,  ..., 0.3480, 0.3534, 0.3354],
+        [0.7070, 0.5561, 0.5802,  ..., 0.7794, 0.7882, 0.7896]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.6691, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+Got 75951.0 / 15 with accuracy 506339.99999999994
+Train Instance Accuracy: nan
+
+100%|██████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:08<00:00,  2.84s/it]
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.4570, 0.4256, 0.4570,  ..., 0.3642, 0.4570, 0.3585],
+        [0.4869, 0.4113, 0.4264,  ..., 0.4285, 0.4252, 0.4274],
+        [0.3702, 0.3702, 0.4422,  ..., 0.3702, 0.3702, 0.4435],
+        [0.5125, 0.4418, 0.4106,  ..., 0.4664, 0.4665, 0.4630],
+        [0.4467, 0.4467, 0.4467,  ..., 0.4467, 0.4467, 0.4467]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.6052, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+Got 36907.0 / 5 with accuracy 738140.0
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.4017, 0.3996, 0.3569,  ..., 0.3783, 0.3811, 0.3863],
+        [0.4205, 0.4918, 0.4123,  ..., 0.4382, 0.4205, 0.4391],
+        [0.4517, 0.4517, 0.4517,  ..., 0.4517, 0.4517, 0.4517],
+        [0.3031, 0.3731, 0.3105,  ..., 0.3243, 0.3303, 0.3031],
+        [0.4220, 0.4766, 0.4798,  ..., 0.4220, 0.4220, 0.4442]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.5961, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+Got 73375.0 / 10 with accuracy 733750.0
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.4022, 0.4070, 0.3915,  ..., 0.3896, 0.3875, 0.4029],
+        [0.3976, 0.4577, 0.4509,  ..., 0.3976, 0.4652, 0.4581],
+        [0.4503, 0.4503, 0.2581,  ..., 0.2283, 0.4503, 0.2530],
+        [0.4133, 0.3616, 0.4332,  ..., 0.4476, 0.4133, 0.4482],
+        [0.3704, 0.3704, 0.3704,  ..., 0.3704, 0.3704, 0.3704]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.5556, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+Got 112499.0 / 15 with accuracy 749993.3333333334
+Train Instance Accuracy: nan
+Epoch 1 (3/200):
+  0%|                                                                                              | 0/3 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 261, in <module>
+    main(args)
+  File "train.py", line 187, in main
+    for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/tqdm/std.py", line 1195, in __iter__
+    for obj in iterable:
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 435, in __next__
+    data = self._next_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1068, in _next_data
+    idx, data = self._get_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1034, in _get_data
+    success, data = self._try_get_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 872, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/queues.py", line 104, in get
+    if not self._poll(timeout):
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 257, in poll
+    return self._poll(timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 414, in _poll
+    r = wait([self], timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 921, in wait
+    ready = selector.select(timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

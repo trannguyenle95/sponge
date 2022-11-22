@@ -1,0 +1,413 @@
+2022-11-22 23:02:55,842 INFO    StreamThr :12022 [internal.py:wandb_internal():91] W&B internal server running at pid: 12022, started at: 2022-11-22 23:02:55.841228
+2022-11-22 23:02:55,845 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: status
+2022-11-22 23:02:55,848 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: status
+2022-11-22 23:02:55,850 DEBUG   SenderThread:12022 [sender.py:send():303] send: header
+2022-11-22 23:02:55,850 INFO    WriterThread:12022 [datastore.py:open_for_write():75] open: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/run-1n6vsrw6.wandb
+2022-11-22 23:02:55,855 DEBUG   SenderThread:12022 [sender.py:send():303] send: run
+2022-11-22 23:02:56,341 INFO    SenderThread:12022 [dir_watcher.py:__init__():216] watching files in: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files
+2022-11-22 23:02:56,341 INFO    SenderThread:12022 [sender.py:_start_run_threads():931] run started: 1n6vsrw6 with start time 1669150975.833517
+2022-11-22 23:02:56,341 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:02:56,342 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:02:56,342 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: check_version
+2022-11-22 23:02:56,342 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: check_version
+2022-11-22 23:02:56,432 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: run_start
+2022-11-22 23:02:56,435 DEBUG   HandlerThread:12022 [system_info.py:__init__():31] System info init
+2022-11-22 23:02:56,435 DEBUG   HandlerThread:12022 [system_info.py:__init__():46] System info init done
+2022-11-22 23:02:56,435 INFO    HandlerThread:12022 [system_monitor.py:start():150] Starting system monitor
+2022-11-22 23:02:56,435 INFO    SystemMonitor:12022 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2022-11-22 23:02:56,435 INFO    HandlerThread:12022 [system_monitor.py:probe():168] Collecting system info
+2022-11-22 23:02:56,436 INFO    SystemMonitor:12022 [interfaces.py:start():168] Started cpu
+2022-11-22 23:02:56,436 INFO    SystemMonitor:12022 [interfaces.py:start():168] Started disk
+2022-11-22 23:02:56,436 INFO    SystemMonitor:12022 [interfaces.py:start():168] Started gpu
+2022-11-22 23:02:56,437 INFO    SystemMonitor:12022 [interfaces.py:start():168] Started memory
+2022-11-22 23:02:56,437 INFO    SystemMonitor:12022 [interfaces.py:start():168] Started network
+2022-11-22 23:02:56,457 DEBUG   HandlerThread:12022 [system_info.py:probe():195] Probing system
+2022-11-22 23:02:56,463 DEBUG   HandlerThread:12022 [system_info.py:_probe_git():180] Probing git
+2022-11-22 23:02:56,476 DEBUG   HandlerThread:12022 [system_info.py:_probe_git():188] Probing git done
+2022-11-22 23:02:56,476 DEBUG   HandlerThread:12022 [system_info.py:probe():241] Probing system done
+2022-11-22 23:02:56,476 DEBUG   HandlerThread:12022 [system_monitor.py:probe():177] {'os': 'Linux-5.7.1-050701-generic-x86_64-with-debian-buster-sid', 'python': '3.7.9', 'heartbeatAt': '2022-11-22T21:02:56.457963', 'startedAt': '2022-11-22T21:02:55.817867', 'docker': None, 'cuda': None, 'args': ('--model', 'deform_contactnet', '--use_normals', '--log_dir', 'deform_contactnet'), 'state': 'running', 'program': 'train.py', 'codePath': 'deform_contactnet/train.py', 'git': {'remote': 'git@version.aalto.fi:hapticexploration/robot_sponge.git', 'commit': '4e9673205d11ac8167b8ca48125ee78cc54cabf8'}, 'email': 'tran.nguyenle@aalto.fi', 'root': '/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge', 'host': 'trannguyenle-Legion-T5-28IMB05', 'username': 'trannguyenle', 'executable': '/home/trannguyenle/anaconda3/envs/rlgpu/bin/python', 'cpu_count': 6, 'cpu_count_logical': 12, 'cpu_freq': {'current': 3999.9972500000003, 'min': 800.0, 'max': 4300.0}, 'cpu_freq_per_core': [{'current': 3999.998, 'min': 800.0, 'max': 4300.0}, {'current': 3999.999, 'min': 800.0, 'max': 4300.0}, {'current': 3999.983, 'min': 800.0, 'max': 4300.0}, {'current': 4000.004, 'min': 800.0, 'max': 4300.0}, {'current': 4000.0, 'min': 800.0, 'max': 4300.0}, {'current': 4000.001, 'min': 800.0, 'max': 4300.0}, {'current': 3999.948, 'min': 800.0, 'max': 4300.0}, {'current': 4000.0, 'min': 800.0, 'max': 4300.0}, {'current': 4000.004, 'min': 800.0, 'max': 4300.0}, {'current': 4000.008, 'min': 800.0, 'max': 4300.0}, {'current': 4000.006, 'min': 800.0, 'max': 4300.0}, {'current': 4000.016, 'min': 800.0, 'max': 4300.0}], 'disk': {'total': 36.41753005981445, 'used': 28.92498779296875}, 'gpu': 'GeForce RTX 2070', 'gpu_count': 1, 'gpu_devices': [{'name': 'GeForce RTX 2070', 'memory_total': 8346533888}], 'memory': {'total': 31.10976791381836}}
+2022-11-22 23:02:56,476 INFO    HandlerThread:12022 [system_monitor.py:probe():178] Finished collecting system info
+2022-11-22 23:02:56,477 INFO    HandlerThread:12022 [system_monitor.py:probe():181] Publishing system info
+2022-11-22 23:02:56,477 DEBUG   HandlerThread:12022 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2022-11-22 23:02:56,477 DEBUG   HandlerThread:12022 [system_info.py:_save_pip():67] Saving pip packages done
+2022-11-22 23:02:56,477 DEBUG   HandlerThread:12022 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2022-11-22 23:02:57,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_created():275] file/dir created: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:02:57,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_created():275] file/dir created: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/requirements.txt
+2022-11-22 23:02:57,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_created():275] file/dir created: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/conda-environment.yaml
+2022-11-22 23:03:02,106 DEBUG   HandlerThread:12022 [system_info.py:_save_conda():86] Saving conda packages done
+2022-11-22 23:03:02,106 INFO    HandlerThread:12022 [system_monitor.py:probe():183] Finished publishing system info
+2022-11-22 23:03:02,228 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:03:02,228 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:03:02,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/conda-environment.yaml
+2022-11-22 23:03:02,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_created():275] file/dir created: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-metadata.json
+2022-11-22 23:03:02,502 DEBUG   SenderThread:12022 [sender.py:send():303] send: telemetry
+2022-11-22 23:03:02,504 DEBUG   SenderThread:12022 [sender.py:send():303] send: files
+2022-11-22 23:03:02,504 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-11-22 23:03:02,871 DEBUG   SenderThread:12022 [sender.py:send():303] send: telemetry
+2022-11-22 23:03:03,194 INFO    Thread-16 :12022 [upload_job.py:push():143] Uploaded file /tmp/tmpapvu38m5wandb/3ae65n66-wandb-metadata.json
+2022-11-22 23:03:03,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_created():275] file/dir created: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:05,343 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:11,601 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:11,601 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:11,601 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:11,604 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:11,826 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:11,826 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:11,826 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:11,827 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:12,022 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:12,023 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:12,023 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:12,023 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:12,167 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:12,167 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:12,167 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:12,168 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:12,345 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:13,345 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:15,346 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:17,504 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:03:17,504 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:03:20,554 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:20,554 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:20,554 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:20,556 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:20,757 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:20,757 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:20,757 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:20,757 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:20,955 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:20,955 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:20,955 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:20,955 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:21,099 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:21,100 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:21,100 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:21,101 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:21,347 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:23,348 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:27,349 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/config.yaml
+2022-11-22 23:03:29,376 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:29,377 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:29,377 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:29,378 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:29,584 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:29,584 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:29,584 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:29,584 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:29,770 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:29,770 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:29,770 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:29,770 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:29,914 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:29,914 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:29,914 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:29,915 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:30,349 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:31,350 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:32,839 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:03:32,839 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:03:38,059 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:38,060 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:38,060 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:38,062 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:38,256 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:38,257 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:38,257 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:38,257 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:38,351 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:38,444 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:38,445 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:38,445 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:38,445 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:38,583 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:38,583 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:38,583 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:38,584 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:39,352 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:39,352 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:41,352 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:46,668 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:46,668 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:46,668 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:46,670 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:46,865 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:46,866 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:46,866 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:46,866 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:47,053 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:47,053 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:47,053 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:47,053 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:47,190 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:47,191 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:47,191 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:47,192 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:47,353 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:48,044 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:03:48,044 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:03:49,354 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:03:55,345 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:55,346 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:55,346 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:55,347 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:55,355 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:55,550 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:55,551 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:55,551 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:55,551 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:55,748 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:55,749 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:55,749 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:55,749 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:55,904 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:03:55,904 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:03:55,905 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:03:55,905 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:03:56,356 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:03:56,437 DEBUG   SystemMonitor:12022 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2022-11-22 23:03:56,438 DEBUG   SenderThread:12022 [sender.py:send():303] send: stats
+2022-11-22 23:03:57,356 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:03,458 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:04:03,458 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:04:04,323 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:04,323 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:04,324 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:04,324 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:04,358 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:04,525 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:04,525 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:04,525 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:04,526 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:04,719 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:04,720 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:04,720 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:04,720 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:04,863 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:04,863 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:04,863 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:04,864 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:05,358 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:05,358 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:07,359 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:13,147 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:13,148 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:13,148 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:13,148 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:13,345 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:13,346 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:13,346 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:13,346 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:13,360 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:13,533 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:13,533 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:13,533 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:13,533 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:13,676 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:13,677 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:13,677 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:13,678 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:14,360 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:15,360 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:18,714 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:04:18,714 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:04:21,775 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:21,775 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:21,775 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:21,777 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:21,973 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:21,974 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:21,974 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:21,974 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:22,163 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:22,163 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:22,163 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:22,163 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:22,306 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:22,306 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:22,306 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:22,307 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:22,362 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:23,363 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:25,363 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:26,438 DEBUG   SenderThread:12022 [sender.py:send():303] send: stats
+2022-11-22 23:04:30,682 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:30,682 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:30,682 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:30,682 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:30,882 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:30,882 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:30,882 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:30,882 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:31,070 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:31,070 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:31,070 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:31,070 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:31,206 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:31,206 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:31,207 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:31,208 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:31,364 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:33,365 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:33,971 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:04:33,971 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:04:39,505 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:39,505 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:39,506 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:39,506 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:39,701 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:39,702 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:39,702 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:39,702 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:39,889 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:39,890 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:39,890 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:39,890 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:40,030 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:40,030 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:40,030 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:40,031 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:40,367 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:41,367 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:48,321 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:48,321 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:48,321 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:48,323 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:48,369 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:48,520 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:48,520 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:48,521 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:48,521 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:48,707 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:48,708 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:48,708 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:48,708 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:48,854 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: partial_history
+2022-11-22 23:04:48,855 DEBUG   SenderThread:12022 [sender.py:send():303] send: history
+2022-11-22 23:04:48,855 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:48,855 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:49,229 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: stop_status
+2022-11-22 23:04:49,229 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: stop_status
+2022-11-22 23:04:49,369 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:49,369 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:50,243 DEBUG   SenderThread:12022 [sender.py:send():303] send: exit
+2022-11-22 23:04:50,243 INFO    SenderThread:12022 [sender.py:send_exit():442] handling exit code: 255
+2022-11-22 23:04:50,243 INFO    SenderThread:12022 [sender.py:send_exit():444] handling runtime: 113
+2022-11-22 23:04:50,244 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:50,244 INFO    SenderThread:12022 [sender.py:send_exit():450] send defer
+2022-11-22 23:04:50,244 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,244 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 0
+2022-11-22 23:04:50,244 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,244 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 0
+2022-11-22 23:04:50,244 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 1
+2022-11-22 23:04:50,244 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,244 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 1
+2022-11-22 23:04:50,245 INFO    HandlerThread:12022 [system_monitor.py:finish():160] Stopping system monitor
+2022-11-22 23:04:50,245 DEBUG   SystemMonitor:12022 [system_monitor.py:_start():137] Finished system metrics aggregation loop
+2022-11-22 23:04:50,245 DEBUG   SystemMonitor:12022 [system_monitor.py:_start():141] Publishing last batch of metrics
+2022-11-22 23:04:50,251 INFO    HandlerThread:12022 [interfaces.py:finish():173] Joined cpu
+2022-11-22 23:04:50,251 INFO    HandlerThread:12022 [interfaces.py:finish():173] Joined disk
+2022-11-22 23:04:50,302 INFO    HandlerThread:12022 [interfaces.py:finish():173] Joined gpu
+2022-11-22 23:04:50,302 INFO    HandlerThread:12022 [interfaces.py:finish():173] Joined memory
+2022-11-22 23:04:50,302 INFO    HandlerThread:12022 [interfaces.py:finish():173] Joined network
+2022-11-22 23:04:50,302 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,302 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 1
+2022-11-22 23:04:50,302 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 2
+2022-11-22 23:04:50,302 DEBUG   SenderThread:12022 [sender.py:send():303] send: stats
+2022-11-22 23:04:50,303 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,303 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 2
+2022-11-22 23:04:50,303 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,303 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 2
+2022-11-22 23:04:50,303 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 3
+2022-11-22 23:04:50,303 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,303 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 3
+2022-11-22 23:04:50,303 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,303 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 3
+2022-11-22 23:04:50,303 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 4
+2022-11-22 23:04:50,303 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,303 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 4
+2022-11-22 23:04:50,304 DEBUG   SenderThread:12022 [sender.py:send():303] send: summary
+2022-11-22 23:04:50,304 INFO    SenderThread:12022 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-22 23:04:50,304 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,304 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 4
+2022-11-22 23:04:50,304 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 5
+2022-11-22 23:04:50,304 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,304 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 5
+2022-11-22 23:04:50,304 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,304 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 5
+2022-11-22 23:04:50,304 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 6
+2022-11-22 23:04:50,304 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:50,305 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 6
+2022-11-22 23:04:50,305 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:50,305 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 6
+2022-11-22 23:04:50,369 INFO    Thread-13 :12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:51,133 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 7
+2022-11-22 23:04:51,133 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:51,133 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 7
+2022-11-22 23:04:51,133 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:51,133 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 7
+2022-11-22 23:04:51,133 INFO    SenderThread:12022 [dir_watcher.py:finish():362] shutting down directory watcher
+2022-11-22 23:04:51,243 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-22 23:04:51,371 INFO    SenderThread:12022 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:51,372 INFO    SenderThread:12022 [dir_watcher.py:finish():392] scan: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files
+2022-11-22 23:04:51,372 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/config.yaml config.yaml
+2022-11-22 23:04:51,372 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log output.log
+2022-11-22 23:04:51,372 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-metadata.json wandb-metadata.json
+2022-11-22 23:04:51,372 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/conda-environment.yaml conda-environment.yaml
+2022-11-22 23:04:51,374 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json wandb-summary.json
+2022-11-22 23:04:51,380 INFO    SenderThread:12022 [dir_watcher.py:finish():406] scan save: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/requirements.txt requirements.txt
+2022-11-22 23:04:51,382 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 8
+2022-11-22 23:04:51,382 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: poll_exit
+2022-11-22 23:04:51,385 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:51,385 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 8
+2022-11-22 23:04:51,385 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:51,385 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 8
+2022-11-22 23:04:51,385 INFO    SenderThread:12022 [file_pusher.py:finish():168] shutting down file pusher
+2022-11-22 23:04:52,154 INFO    Thread-21 :12022 [upload_job.py:push():143] Uploaded file /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/requirements.txt
+2022-11-22 23:04:52,160 INFO    Thread-18 :12022 [upload_job.py:push():143] Uploaded file /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/output.log
+2022-11-22 23:04:52,162 INFO    Thread-19 :12022 [upload_job.py:push():143] Uploaded file /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/conda-environment.yaml
+2022-11-22 23:04:52,169 INFO    Thread-17 :12022 [upload_job.py:push():143] Uploaded file /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/config.yaml
+2022-11-22 23:04:52,171 INFO    Thread-20 :12022 [upload_job.py:push():143] Uploaded file /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/files/wandb-summary.json
+2022-11-22 23:04:52,244 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-22 23:04:52,244 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: poll_exit
+2022-11-22 23:04:52,373 INFO    Thread-12 :12022 [sender.py:transition_state():463] send defer: 9
+2022-11-22 23:04:52,374 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:52,374 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 9
+2022-11-22 23:04:52,375 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:52,375 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 9
+2022-11-22 23:04:52,375 INFO    SenderThread:12022 [file_pusher.py:join():173] waiting for file pusher
+2022-11-22 23:04:52,375 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 10
+2022-11-22 23:04:52,375 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:52,375 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 10
+2022-11-22 23:04:52,375 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:52,375 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 10
+2022-11-22 23:04:53,072 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 11
+2022-11-22 23:04:53,073 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:53,073 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 11
+2022-11-22 23:04:53,073 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:53,073 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 11
+2022-11-22 23:04:53,074 INFO    SenderThread:12022 [sender.py:transition_state():463] send defer: 12
+2022-11-22 23:04:53,075 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: defer
+2022-11-22 23:04:53,075 INFO    HandlerThread:12022 [handler.py:handle_request_defer():162] handle defer: 12
+2022-11-22 23:04:53,076 DEBUG   SenderThread:12022 [sender.py:send():303] send: final
+2022-11-22 23:04:53,076 DEBUG   SenderThread:12022 [sender.py:send():303] send: footer
+2022-11-22 23:04:53,076 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: defer
+2022-11-22 23:04:53,077 INFO    SenderThread:12022 [sender.py:send_request_defer():459] handle sender defer: 12
+2022-11-22 23:04:53,079 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-22 23:04:53,080 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: poll_exit
+2022-11-22 23:04:53,081 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: poll_exit
+2022-11-22 23:04:53,081 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: poll_exit
+2022-11-22 23:04:53,081 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: server_info
+2022-11-22 23:04:53,081 DEBUG   SenderThread:12022 [sender.py:send_request():317] send_request: server_info
+2022-11-22 23:04:53,083 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: get_summary
+2022-11-22 23:04:53,084 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: sampled_history
+2022-11-22 23:04:53,591 INFO    MainThread:12022 [wandb_run.py:_footer_history_summary_info():3377] rendering history
+2022-11-22 23:04:53,591 INFO    MainThread:12022 [wandb_run.py:_footer_history_summary_info():3409] rendering summary
+2022-11-22 23:04:53,591 INFO    MainThread:12022 [wandb_run.py:_footer_sync_info():3333] logging synced files
+2022-11-22 23:04:53,592 DEBUG   HandlerThread:12022 [handler.py:handle_request():139] handle_request: shutdown
+2022-11-22 23:04:53,592 INFO    HandlerThread:12022 [handler.py:finish():814] shutting down handler
+2022-11-22 23:04:54,077 INFO    WriterThread:12022 [datastore.py:close():279] close: /home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge/deform_contactnet/wandb/run-20221122_230255-1n6vsrw6/run-1n6vsrw6.wandb
+2022-11-22 23:04:54,591 INFO    SenderThread:12022 [sender.py:finish():1331] shutting down sender
+2022-11-22 23:04:54,591 INFO    SenderThread:12022 [file_pusher.py:finish():168] shutting down file pusher
+2022-11-22 23:04:54,591 INFO    SenderThread:12022 [file_pusher.py:join():173] waiting for file pusher
+2022-11-22 23:04:54,596 INFO    MainThread:12022 [internal.py:handle_exit():78] Internal process exited

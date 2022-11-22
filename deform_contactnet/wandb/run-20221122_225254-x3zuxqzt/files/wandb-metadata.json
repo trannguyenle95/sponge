@@ -1,0 +1,111 @@
+{
+    "os": "Linux-5.7.1-050701-generic-x86_64-with-debian-buster-sid",
+    "python": "3.7.9",
+    "heartbeatAt": "2022-11-22T20:52:54.857992",
+    "startedAt": "2022-11-22T20:52:54.123685",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--model",
+        "deform_contactnet",
+        "--use_normals",
+        "--log_dir",
+        "deform_contactnet"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "deform_contactnet/train.py",
+    "git": {
+        "remote": "git@version.aalto.fi:hapticexploration/robot_sponge.git",
+        "commit": "4e9673205d11ac8167b8ca48125ee78cc54cabf8"
+    },
+    "email": "tran.nguyenle@aalto.fi",
+    "root": "/home/trannguyenle/RemoteWorkingStation/ros_workspaces/IsaacGym/isaacgym/python/robot_sponge",
+    "host": "trannguyenle-Legion-T5-28IMB05",
+    "username": "trannguyenle",
+    "executable": "/home/trannguyenle/anaconda3/envs/rlgpu/bin/python",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 4000.0044166666667,
+        "min": 800.0,
+        "max": 4300.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 4000.003,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.004,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.0,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.032,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.012,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.0,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.009,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.011,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.001,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 3999.982,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 3999.999,
+            "min": 800.0,
+            "max": 4300.0
+        },
+        {
+            "current": 4000.0,
+            "min": 800.0,
+            "max": 4300.0
+        }
+    ],
+    "disk": {
+        "total": 36.41753005981445,
+        "used": 28.923866271972656
+    },
+    "gpu": "GeForce RTX 2070",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "GeForce RTX 2070",
+            "memory_total": 8346533888
+        }
+    ],
+    "memory": {
+        "total": 31.10976791381836
+    }
+}

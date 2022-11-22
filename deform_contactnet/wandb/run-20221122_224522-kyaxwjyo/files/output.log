@@ -1,0 +1,31 @@
+PARAMETER ...
+Namespace(batch_size=5, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False)
+Load dataset ...
+23
+No existing model, starting training from scratch...
+Epoch 1 (1/200):
+  0%|                                                                                              | 0/3 [00:00<?, ?it/s]
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.5550, 0.5550, 0.5550,  ..., 0.5550, 0.5550, 0.5550],
+        [0.6284, 0.7096, 0.6284,  ..., 0.7028, 0.7175, 0.7063],
+        [0.5500, 0.4848, 0.5500,  ..., 0.5500, 0.5500, 0.5500],
+        [0.4358, 0.4195, 0.4587,  ..., 0.3678, 0.4358, 0.4358],
+        [0.7598, 0.6443, 0.6646,  ..., 0.6750, 0.7598, 0.7598]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.8850, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+tensor([[1., 1., 1.,  ..., 1., 1., 1.],
+        [1., 1., 1.,  ..., 1., 1., 1.],
+        [1., 0., 1.,  ..., 1., 1., 1.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+  0%|                                                                                              | 0/3 [00:08<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 258, in <module>
+    main(args)
+  File "train.py", line 207, in main
+    num_correct += (predictions == y).sum()
+UnboundLocalError: local variable 'num_correct' referenced before assignment

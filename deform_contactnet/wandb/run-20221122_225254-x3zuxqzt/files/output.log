@@ -1,0 +1,81 @@
+PARAMETER ...
+Namespace(batch_size=5, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False)
+Load dataset ...
+23
+No existing model, starting training from scratch...
+Epoch 1 (1/200):
+  0%|                                                                                              | 0/3 [00:00<?, ?it/s]
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.8706, 0.6762, 0.5824,  ..., 0.6438, 0.6383, 0.6317],
+        [0.5655, 0.7213, 0.6865,  ..., 0.5982, 0.5782, 0.6181],
+        [0.4902, 0.4902, 0.4902,  ..., 0.4902, 0.4902, 0.3439],
+        [0.5502, 0.5502, 0.5502,  ..., 0.5502, 0.5502, 0.6920],
+        [0.5833, 0.6102, 0.6039,  ..., 0.6339, 0.6434, 0.5833]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.8743, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+torch.Size([5, 8894]) <built-in method size of Tensor object at 0x7f3ae9b221e0>
+Got 11309.0 / 5 with accuracy 226180.00000000003
+5 8 8894
+100%|██████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:08<00:00,  2.94s/it]
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.5074, 0.5074, 0.4612,  ..., 0.4192, 0.5074, 0.4146],
+        [0.6412, 0.6412, 0.6412,  ..., 0.6412, 0.6412, 0.5874],
+        [0.3982, 0.5729, 0.5846,  ..., 0.5300, 0.5224, 0.5352],
+        [0.6651, 0.5712, 0.7257,  ..., 0.5629, 0.5640, 0.6651],
+        [0.6443, 0.6538, 0.6443,  ..., 0.6443, 0.6988, 0.6443]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.8598, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+torch.Size([5, 8894]) <built-in method size of Tensor object at 0x7f3aeab99460>
+Got 21807.0 / 10 with accuracy 218069.99999999997
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.5950, 0.5950, 0.5950,  ..., 0.5950, 0.5950, 0.5950],
+        [0.5535, 0.7684, 0.5535,  ..., 0.6979, 0.5535, 0.7177],
+        [0.5972, 0.5972, 0.5972,  ..., 0.5972, 0.5972, 0.5972],
+        [0.5243, 0.5243, 0.6981,  ..., 0.5243, 0.4615, 0.5243],
+        [0.4742, 0.7413, 0.4742,  ..., 0.4251, 0.4742, 0.4226]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+Loss:  tensor(0.8326, device='cuda:0', grad_fn=<BinaryCrossEntropyBackward>)
+torch.Size([5, 8894]) <built-in method size of Tensor object at 0x7f3ae80c1690>
+Got 31899.0 / 15 with accuracy 212660.0
+Train Instance Accuracy: nan
+Epoch 1 (2/200):
+Traceback (most recent call last):
+  File "train.py", line 262, in <module>
+    main(args)
+  File "train.py", line 187, in main
+    for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/tqdm/std.py", line 1195, in __iter__
+    for obj in iterable:
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 435, in __next__
+    data = self._next_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1068, in _next_data
+    idx, data = self._get_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1034, in _get_data
+    success, data = self._try_get_data()
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 872, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/queues.py", line 104, in get
+    if not self._poll(timeout):
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 257, in poll
+    return self._poll(timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 414, in _poll
+    r = wait([self], timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/multiprocessing/connection.py", line 921, in wait
+    ready = selector.select(timeout)
+  File "/home/trannguyenle/anaconda3/envs/rlgpu/lib/python3.7/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

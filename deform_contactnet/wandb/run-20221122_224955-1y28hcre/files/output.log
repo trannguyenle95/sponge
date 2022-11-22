@@ -1,0 +1,26 @@
+PARAMETER ...
+Namespace(batch_size=5, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False)
+Load dataset ...
+23
+No existing model, starting training from scratch...
+Epoch 1 (1/200):
+  0%|                                                                                              | 0/3 [00:00<?, ?it/s]
+5 8 8894
+target:  tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='cuda:0')
+pred:  tensor([[0.4200, 0.3174, 0.2751,  ..., 0.3834, 0.3899, 0.3560],
+        [0.4576, 0.5105, 0.5656,  ..., 0.4996, 0.4576, 0.5462],
+        [0.4501, 0.4501, 0.4501,  ..., 0.4501, 0.4501, 0.4501],
+        [0.4355, 0.4355, 0.4355,  ..., 0.4439, 0.4320, 0.4213],
+        [0.4078, 0.3276, 0.4782,  ..., 0.5134, 0.5017, 0.4566]],
+       device='cuda:0', grad_fn=<ViewBackward>)
+  0%|                                                                                              | 0/3 [00:08<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 260, in <module>
+    main(args)
+  File "train.py", line 208, in main
+    num_correct += (predictions == target).float().sum()
+UnboundLocalError: local variable 'num_correct' referenced before assignment
