@@ -106,11 +106,9 @@ class get_loss(torch.nn.Module):
         self.mat_diff_loss_scale = mat_diff_loss_scale
 
     def forward(self, pred, target, trans_feat):
-        print("target: ",target)
-        print("pred: ", pred)
         # target = target.view(target.shape[0],target[1],1)
         loss = nn.BCEWithLogitsLoss()(pred, target)
-        print("Loss: ", loss)
+        # print("Loss: ", loss)
         return loss
 
 

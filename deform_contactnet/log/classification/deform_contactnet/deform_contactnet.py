@@ -96,7 +96,7 @@ class get_model(nn.Module):
         x = self.conv4(x)
         x = x.transpose(2,1).contiguous()
         # x = F.log_softmax(x.view(-1,self.k), dim=-1)
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
         x = x.view(batchsize, n_pts)
         return x, trans_feat
 
@@ -106,10 +106,8 @@ class get_loss(torch.nn.Module):
         self.mat_diff_loss_scale = mat_diff_loss_scale
 
     def forward(self, pred, target, trans_feat):
-        print("target: ",target)
-        print("pred: ", pred)
         # target = target.view(target.shape[0],target[1],1)
-        loss = nn.BCELoss()(pred, target)
+        loss = nn.BCEWithLogitsLoss()(pred, target)
         print("Loss: ", loss)
         return loss
 

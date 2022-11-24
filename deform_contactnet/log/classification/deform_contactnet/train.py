@@ -1,6 +1,6 @@
 """
-Author: Benny
-Date: Nov 2019
+Author: Tran Nguyen Le
+Date: Nov 2022
 """
 
 import os
@@ -15,7 +15,7 @@ import provider
 import importlib
 import shutil
 import argparse
-
+import socket
 from pathlib import Path
 from tqdm import tqdm
 from data_utils.ModelNetDataLoader import ModelNetDataLoader
@@ -25,8 +25,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
 run_id = str(uuid.uuid4())
+computer_name = str(socket.gethostname())
 wandb.init(project="robo-sponge",
-                    name=f'Deform-ContactNet-{run_id}',
+                    name=f'Deform-ContactNet-{computer_name}-{run_id}',
                     group=f'Deform-ContactNet')
                     
 def parse_args():
@@ -219,10 +220,10 @@ def main(args):
     best_f1 = 0.0
     for epoch in range(start_epoch, args.epoch):
         log_string('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
-        mean_correct = []
         classifier = classifier.train()
-        num_correct = 0
-        num_samples = 0
+        loss_per_epoch = 0
+        predictions_per_epoch = []
+        target_per_epoch = []
         scheduler.step()
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             optimizer.zero_grad()
@@ -233,24 +234,32 @@ def main(args):
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
             points = torch.Tensor(points)
             points = points.transpose(2, 1)
-            print(points)
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
 
             pred, trans_feat = classifier(points)
             loss = criterion(pred, target.float(), trans_feat)
-            wandb.log({"loss": loss})
+            wandb.log({"loss_per_batch": loss})
+            loss_per_epoch += loss
             # pred_choice = pred.data.max(0)[0]
             # correct = pred_choice.eq(target.float().data).cpu().sum()
             # mean_correct.append(correct.item() / float(points.size()[0]))
             loss.backward()
             optimizer.step()
             predictions = (pred > 0.5).float()
-        f1_score, tp, fp, tn, fn = f1_confusion(predictions,target)
-        wandb.log({"f1_score": f1_score})
-        print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
-        # global_step += 1
-        # train_instance_acc = np.mean(mean_correct)
+            f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target)
+            wandb.log({"f1_score_per_batch": f1_score_per_batch})
+            predictions_per_epoch.append(predictions)
+            target_per_epoch.append(target)
+        predictions_per_epoch = torch.cat(predictions_per_epoch)
+        target_per_epoch = torch.cat(target_per_epoch)   
+        f1_score, tp, fp, tn, fn = f1_confusion(predictions_per_epoch,target_per_epoch)
+        loss_per_epoch /= len(trainDataLoader)
+        print(len(trainDataLoader),loss_per_epoch)
+        wandb.log({"f1_score_per_epoch": f1_score})
+        wandb.log({"loss_per_epoch": loss_per_epoch})
+
+        # print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
         log_string('F1_score: %f' % f1_score)
         if (f1_score >= best_f1):
                 best_f1 = f1_score
