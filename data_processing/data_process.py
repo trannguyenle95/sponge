@@ -22,7 +22,7 @@ def main():
     object_name = args.object
 
     OBJ_RESULTS_DIR = "../results/"+ object_name +"_all"
-    PICKLE_DATA_DIR = "../dataset/"
+    PICKLE_DATA_DIR = "../deform_contactnet/dataset/"
 
     target_object_pcd_file_name = "target_object_pc/"+str(object_name)+".pcd"
     target_object_pcd_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),target_object_pcd_file_name)

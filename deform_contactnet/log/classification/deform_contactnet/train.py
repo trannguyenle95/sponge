@@ -120,7 +120,7 @@ def main(args):
 
     '''DATA LOADING'''
     log_string('Load dataset ...')
-    data_path = '../dataset/'
+    data_path = 'dataset/'
 
     trainval_dataset = ModelNetDataLoader(root=data_path, split='train')
     train_dataset_percentage = 0.8
