@@ -267,5 +267,3 @@ def random_point_dropout(batch_pc, max_dropout_ratio=0.875):
             batch_pc[b,drop_idx,:] = batch_pc[b,0,:] # set to the first point
     return batch_pc
 
-
-

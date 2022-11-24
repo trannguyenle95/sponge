@@ -58,12 +58,12 @@ class ModelNetDataLoader(Dataset):
         for file in all_files:
             data = np.load(file,allow_pickle=True)
             all_data.extend(data)
-        self.data = data
+        self.data = all_data
         print(len(all_data))
         self.data_idxs = [i for i in range(len(all_data))]
-    def get_dataset_statistics(self):
-        # return self.num_point, self.pos_label_weight, self.data_idxs
-        return None, 20, self.data_idxs
+    # def get_dataset_statistics(self):
+    #     # return self.num_point, self.pos_label_weight, self.data_idxs
+    #     return None, 20, self.data_idxs
 
     def __len__(self):
         return len(self.data_idxs)
@@ -94,6 +94,13 @@ class ModelNetDataLoader(Dataset):
     def __getitem__(self, index):
         return self._get_item(index)
 
+# from torch.nn.utils.rnn import pad_sequence #(1)
+# def custom_collate(data): #(2)
+#     point = [torch.tensor(d[0]) for d in data] #(3)
+#     label = [torch.tensor(d[1]) for d in data]
+#     point = pad_sequence(point, batch_first=True, padding_value=-10) #(4)
+#     label = pad_sequence(label, batch_first=True, padding_value=-10) #(4)
+#     return point,label
 
 if __name__ == '__main__':
     import torch

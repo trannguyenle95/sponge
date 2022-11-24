@@ -19,6 +19,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 from data_utils.ModelNetDataLoader import ModelNetDataLoader
+from torch.nn.utils.rnn import pad_sequence #(1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
@@ -32,7 +33,7 @@ def parse_args():
     parser = argparse.ArgumentParser('training')
     parser.add_argument('--use_cpu', action='store_true', default=False, help='use cpu mode')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
-    parser.add_argument('--batch_size', type=int, default=5, help='batch size in training')
+    parser.add_argument('--batch_size', type=int, default=32, help='batch size in training')
     parser.add_argument('--model', default='pointnet_cls', help='model name [default: pointnet_cls]')
     parser.add_argument('--num_category', default=1, type=int,  help='training on ModelNet10/40')
     parser.add_argument('--epoch', default=200, type=int, help='number of epoch in training')
@@ -45,6 +46,43 @@ def parse_args():
     parser.add_argument('--process_data', action='store_true', default=False, help='save data offline')
     parser.add_argument('--use_uniform_sample', action='store_true', default=False, help='use uniform sampiling')
     return parser.parse_args()
+
+def custom_collate(data): #(2)
+    point = [torch.tensor(d[0]) for d in data] #(3)
+    label = [torch.tensor(d[1]) for d in data]
+    point = pad_sequence(point, batch_first=True, padding_value=-10) #(4)
+    label = pad_sequence(label, batch_first=True, padding_value=-10) #(4)
+    return point,label
+
+def f1_confusion(prediction, truth):
+    """ Returns the confusion matrix for the values in the `prediction` and `truth`
+    tensors, i.e. the amount of positions where the values of `prediction`
+    and `truth` are
+    - 1 and 1 (True Positive)
+    - 1 and 0 (False Positive)
+    - 0 and 0 (True Negative)
+    - 0 and 1 (False Negative)
+    """
+
+    confusion_vector = prediction / truth
+    # Element-wise division of the 2 tensors returns a new tensor which holds a
+    # unique value for each case:
+    #   1     where prediction and truth are 1 (True Positive)
+    #   inf   where prediction is 1 and truth is 0 (False Positive)
+    #   nan   where prediction and truth are 0 (True Negative)
+    #   0     where prediction is 0 and truth is 1 (False Negative)
+
+    true_positives = torch.sum(confusion_vector == 1).item()
+    false_positives = torch.sum(confusion_vector == float('inf')).item()
+    true_negatives = torch.sum(torch.isnan(confusion_vector)).item()
+    false_negatives = torch.sum(confusion_vector == 0).item()
+    
+    epsilon = 1e-7
+    precision = true_positives / (true_positives + false_positives + epsilon)
+    recall = true_positives / (true_positives + false_negatives + epsilon)
+    f1 = 2* (precision*recall) / (precision + recall + epsilon)
+
+    return f1,true_positives, false_positives, true_negatives, false_negatives
 
 
 def inplace_relu(m):
@@ -127,8 +165,8 @@ def main(args):
     train_dataset, validation_dataset = torch.utils.data.random_split(trainval_dataset,[int(train_dataset_percentage * len(trainval_dataset)), len(trainval_dataset) - int(train_dataset_percentage * len(trainval_dataset))], generator=torch.Generator().manual_seed(42))
     # test_dataset = ModelNetDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
 
-    trainDataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10, drop_last=True)
-    valDataLoader = torch.utils.data.DataLoader(validation_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10, drop_last=True)
+    trainDataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,collate_fn=custom_collate,num_workers=10, drop_last=True)
+    valDataLoader = torch.utils.data.DataLoader(validation_dataset, batch_size=args.batch_size, shuffle=True,collate_fn=custom_collate, num_workers=10, drop_last=True)
 
     # testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10)
 
@@ -177,7 +215,7 @@ def main(args):
     logger.info('Start training...')
     # Magic
     wandb.watch(classifier, log_freq=100)
-    best_instance_acc = 50
+    best_f1 = 0.0
     for epoch in range(start_epoch, args.epoch):
         log_string('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         mean_correct = []
@@ -207,22 +245,20 @@ def main(args):
             loss.backward()
             optimizer.step()
             predictions = (pred > 0.5).float()
-            num_correct += (predictions == target).float().sum()
-            num_samples += predictions.size(0)*predictions.size(1)
-        training_acc = float(num_correct)/float(num_samples)*100
-        wandb.log({"training_acc": training_acc})
-        print("Got {} / {} with accuracy {}".format(num_correct, num_samples, training_acc))
+        f1_score, tp, fp, tn, fn = f1_confusion(pred,target)
+        wandb.log({"f1_score": f1_score})
+        print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
         # global_step += 1
         # train_instance_acc = np.mean(mean_correct)
-        log_string('Train Instance Accuracy: %f' % training_acc)
-        if (training_acc >= best_instance_acc):
-                best_instance_acc = training_acc
+        log_string('F1_score: %f' % f1_score)
+        if (f1_score >= best_f1):
+                best_f1 = f1_score
                 logger.info('Save model...')
                 savepath = str(checkpoints_dir) + '/best_model.pth'
                 log_string('Saving at %s' % savepath)
                 state = {
                     'epoch': epoch,
-                    'train_instance_acc': training_acc,
+                    'f1_score': f1_score,
                     'model_state_dict': classifier.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                 }
