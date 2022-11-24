@@ -239,13 +239,10 @@ def main(args):
 
             pred, trans_feat = classifier(points)
             loss = criterion(pred, target.float(), trans_feat)
-            wandb.log({"loss_per_batch": loss})
-            loss_per_epoch += loss
-            # pred_choice = pred.data.max(0)[0]
-            # correct = pred_choice.eq(target.float().data).cpu().sum()
-            # mean_correct.append(correct.item() / float(points.size()[0]))
             loss.backward()
             optimizer.step()
+            wandb.log({"loss_per_batch": loss.item()})
+            loss_per_epoch += loss.item()
             predictions = (pred > 0.5).float()
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target)
             wandb.log({"f1_score_per_batch": f1_score_per_batch})
