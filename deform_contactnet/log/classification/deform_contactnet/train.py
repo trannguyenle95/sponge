@@ -19,7 +19,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 from data_utils.ModelNetDataLoader import ModelNetDataLoader
-from torch.nn.utils.rnn import pad_sequence #(1)
+from torch.nn.utils.rnn import pad_sequence 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
@@ -28,6 +28,7 @@ run_id = str(uuid.uuid4())
 wandb.init(project="robo-sponge",
                     name=f'Deform-ContactNet-{run_id}',
                     group=f'Deform-ContactNet')
+                    
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('training')
@@ -50,8 +51,8 @@ def parse_args():
 def custom_collate(data): #(2)
     point = [torch.tensor(d[0]) for d in data] #(3)
     label = [torch.tensor(d[1]) for d in data]
-    point = pad_sequence(point, batch_first=True, padding_value=-10) #(4)
-    label = pad_sequence(label, batch_first=True, padding_value=-10) #(4)
+    point = pad_sequence(point, batch_first=True, padding_value=0) #(4)
+    label = pad_sequence(label, batch_first=True, padding_value=0) #(4)
     return point,label
 
 def f1_confusion(prediction, truth):
@@ -232,7 +233,7 @@ def main(args):
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
             points = torch.Tensor(points)
             points = points.transpose(2, 1)
-
+            print(points)
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
 
@@ -245,7 +246,7 @@ def main(args):
             loss.backward()
             optimizer.step()
             predictions = (pred > 0.5).float()
-        f1_score, tp, fp, tn, fn = f1_confusion(pred,target)
+        f1_score, tp, fp, tn, fn = f1_confusion(predictions,target)
         wandb.log({"f1_score": f1_score})
         print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
         # global_step += 1
