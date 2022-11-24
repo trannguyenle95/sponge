@@ -222,6 +222,7 @@ def main(args):
         log_string('Epoch %d (%d/%s):' % (epoch + 1, epoch + 1, args.epoch))
         classifier = classifier.train()
         loss_per_epoch = 0
+        f1_score = 0
         predictions_per_epoch = []
         target_per_epoch = []
         scheduler.step()
