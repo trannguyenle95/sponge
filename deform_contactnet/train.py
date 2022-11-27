@@ -47,8 +47,8 @@ def parse_args():
 def custom_collate(data): #(2)
     point = [torch.tensor(d[0]) for d in data] #(3)
     label = [torch.tensor(d[1]) for d in data]
-    point = pad_sequence(point, batch_first=True, padding_value=0) #(4)
-    label = pad_sequence(label, batch_first=True, padding_value=0) #(4)
+    point = pad_sequence(point, batch_first=True, padding_value=0.0) #(4)
+    label = pad_sequence(label, batch_first=True, padding_value=0.0) #(4)
     return point,label
 
 def f1_confusion(prediction, truth):
@@ -223,7 +223,7 @@ def main(args):
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             optimizer.zero_grad()
             points = points.data.numpy()
-            points = provider.random_point_dropout(points)
+            # points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
             point_vis = points[0,:,0:3]
@@ -268,6 +268,8 @@ def main(args):
                                 "points": prediction_vis,
                             }
                         )})
+                else:
+                    pass
         
         f1_score /= len(trainDataLoader)
         loss_per_epoch /= len(trainDataLoader)
