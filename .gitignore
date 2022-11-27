@@ -1,6 +1,8 @@
 results
 deform_contactnet/dataset
 deform_contactnet/wandb
+deform_contactnet/wandb/latest-run
+wandb
 deform_contactnet/log
 backup_dataset
 dataset

@@ -1,3 +1,8 @@
+## Training deform contactnet models
+# Pointnet++: 
+`python train2.py --model deform_contactnet_pointnet2 --use_normals --log_dir deform_contactnet_pointnet2 --batch_size=8 --epoch=10 --use_wandb --gpu=1`
+# Pointnet: 
+`python train.py --model deform_contactnet_pointnet --use_normals --log_dir deform_contactnet_pointnet --batch_size=9 --use_wandb --epoch=10 --gpu=0` 
 # Sponge Sim
 The script provides a simple example of how to import the Sponge assets into NVIDIA Isaac Gym, launch an FEM simulation with multiple objects across multiple parallel environments, and extract useful features (net forces, nodal coordinates, and element-wise stresses).
 

@@ -186,7 +186,7 @@ def main(args):
             points = torch.Tensor(points)
             points, target = points.float().cuda(), target.long().cuda()
             points = points.transpose(2, 1)
-
+            print(points.shape)
             seg_pred, trans_feat = classifier(points)
             seg_pred = seg_pred.contiguous().view(-1, NUM_CLASSES)
 

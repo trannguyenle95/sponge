@@ -337,7 +337,7 @@ if __name__ == '__main__':
         run_id = str(uuid.uuid4())[:8]
         computer_name = str(socket.gethostname())
         wandb.init(project="robo-sponge",
-                            name=f'Deform-ContactNet-{computer_name}-{run_id}',
+                            name=f'Deform-ContactNet-{computer_name}-{str(args.model)}-{run_id}',
                             group=f'Deform-ContactNet',
                             config=config)
     main(args)
