@@ -230,11 +230,6 @@ def main(args):
             points = torch.Tensor(points)
             points = points.transpose(2, 1) #For network
 
-            #    Ground_truth vis
-            target_vis = target[0,:].data.numpy().reshape((target.shape[1],1))
-            ground_truth_vis = np.hstack((point_vis,target_vis))
-            # --- 
-
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
 
@@ -246,33 +241,39 @@ def main(args):
             predictions = (pred > 0.5).float()
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
             f1_score += f1_score_per_batch
-            #    Ground_truth vis
-            pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
-            prediction_vis = np.hstack((point_vis,pred_vis))
-            # --- 
             if args.use_wandb:
-                if batch_id % 20:
+                wandb.log({"loss_every_per_batch": loss.item()})
+                wandb.log({"f1_score_every_per_batch": f1_score_per_batch})
+            if args.use_wandb:
+                if (batch_id%500==0):
+                    #    Ground_truth vis
+                    target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
+                    ground_truth_vis = np.hstack((point_vis,target_vis))
+                    # --- 
+                    #    Prediction vis
+                    pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
+                    prediction_vis = np.hstack((point_vis,pred_vis))
+                    # --- 
                     wandb.log({
-                            "Ground_truth": wandb.Object3D(
-                                {
-                                    "type": "lidar/beta",
-                                    "points": ground_truth_vis,
-                                }
-                            )})
+                        "Ground_truth": wandb.Object3D(
+                            {
+                                "type": "lidar/beta",
+                                "points": ground_truth_vis,
+                            }
+                        )})
                     wandb.log({
-                            "Prediction": wandb.Object3D(
-                                {
-                                    "type": "lidar/beta",
-                                    "points": prediction_vis,
-                                }
-                            )})
-                    wandb.log({"loss_every_20batch": loss.item()})
-                    wandb.log({"f1_score_every_20batch": f1_score_per_batch})
+                        "Prediction": wandb.Object3D(
+                            {
+                                "type": "lidar/beta",
+                                "points": prediction_vis,
+                            }
+                        )})
+        
         f1_score /= len(trainDataLoader)
         loss_per_epoch /= len(trainDataLoader)
         if args.use_wandb:
-            wandb.log({"f1_score_per_epoch": f1_score, "epoch": epoch})
-            wandb.log({"loss_per_epoch": loss_per_epoch, "epoch": epoch})
+            wandb.log({"Training/f1_score_per_epoch": f1_score, "epoch": epoch})
+            wandb.log({"Training/loss_per_epoch": loss_per_epoch, "epoch": epoch})
 
         # print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
         log_string('F1_score: %f' % f1_score)
@@ -331,7 +332,7 @@ if __name__ == '__main__':
         decay_rate = args.decay_rate,
         optimizer = str(args.optimizer),
         )
-        run_id = str(uuid.uuid4())
+        run_id = str(uuid.uuid4())[:8]
         computer_name = str(socket.gethostname())
         wandb.init(project="robo-sponge",
                             name=f'Deform-ContactNet-{computer_name}-{run_id}',
