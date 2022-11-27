@@ -245,7 +245,7 @@ def main(args):
                 wandb.log({"loss_every_per_batch": loss.item()})
                 wandb.log({"f1_score_every_per_batch": f1_score_per_batch})
             if args.use_wandb:
-                if (batch_id%500==0):
+                if (batch_id%250==0):
                     #    Ground_truth vis
                     target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
                     ground_truth_vis = np.hstack((point_vis,target_vis))
