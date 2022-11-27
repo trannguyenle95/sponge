@@ -46,7 +46,7 @@ def main():
         target_object_pc_pts_normals = np.asarray(target_object_pc.normals)
         # Read data from mutlple h5 files of the object and stack them
         all_files = [os.path.join(OBJ_RESULTS_DIR, o) for o in os.listdir(OBJ_RESULTS_DIR) if o.endswith(".h5") and "iter" in o]
-        print(all_files)
+        # print(all_files)
 
         sponge_position_at_force_contacted_points_all = []
         press_locations_all = []
@@ -59,7 +59,7 @@ def main():
             press_locations = np.array(file['press_locations'])[action_success,:]
             normal_forces_on_nodes = np.array(file['normal_forces_on_nodes'])[action_success,:,:]
             sponge_position_at_force= np.array(file['sponge_position_at_force'])[action_success,:,:]
-            print(file.keys()) 
+            # print(file.keys()) 
             # --- Append all the contact_location into press_locations_all n*(1,3) and corresponded gripper orientation sin/cos component n*(1,2).
             for i in range(int(sponge_position_at_force.shape[0])):
                 sponge_position_at_force_contacted_points_all.append(sponge_position_at_force[i, contact_indexes[i],:])
@@ -70,8 +70,8 @@ def main():
                 ori = np.array([sin_component,cos_component])
                 gripper_ori_all.append(ori)
             # ---  *** ---
-        print(sponge_position_at_force_contacted_points_all[0].shape)
-        print(target_object_pc_pts.shape)
+        # print(sponge_position_at_force_contacted_points_all[0].shape)
+        # print(target_object_pc_pts.shape)
         # print((press_locations_all[0] == target_object_pc_pts).all(1).any()) #Check if sampled points is on target pc
                             
         # Construct ground-truth label n*(n_pts,1) per contact (contact:1 , non-contact:0).
@@ -101,14 +101,14 @@ def main():
             feature_vec = np.zeros((target_object_pc_pts.shape[0],2))
             ind = get_index_array(press_locations_all[i][:,0],target_object_pc_pts[:,0]) #Get index of the press location in the target object pc and set the feature vector to be the orientation
             feature_vec[ind,:] = gripper_ori_all[i]
-            print(ind)
+            # print(ind)
             feature_vec_all.append(feature_vec)
 
-        print(len(contact_label_all),contact_label_all[0].shape, target_object_pc_pts.shape)
+        # print(len(contact_label_all),contact_label_all[0].shape, target_object_pc_pts.shape)
         target_object_pc_pts_with_contact_label_all = []
         target_object_pc_pts_plus_normals = np.append(target_object_pc_pts,target_object_pc_pts_normals , axis=1) #append contact loc with normals
         for i in range(len(sponge_position_at_force_contacted_points_all)):
-            print(sum(contact_label_all[i]))
+            # print(sum(contact_label_all[i]))
             target_object_pc_pts_plus_normals_feature = np.append(target_object_pc_pts_plus_normals, feature_vec_all[i], axis=1) #append contact loc and normals with feature vector = input
             target_object_pc_pts_with_contact_label = np.append(target_object_pc_pts_plus_normals_feature, contact_label_all[i], axis=1) #append input with the label
             target_object_pc_pts_with_contact_label_all.append(target_object_pc_pts_with_contact_label) # All in all: n*(n_pts,9) - 3: pts location, 3: pts normals, 2: feature vectors, 1: label
