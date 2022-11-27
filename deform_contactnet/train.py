@@ -7,8 +7,6 @@ import os
 import sys
 import torch
 import numpy as np
-import wandb
-import uuid
 import datetime
 import logging
 import provider
@@ -24,11 +22,6 @@ from torch.nn.utils.rnn import pad_sequence
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
-run_id = str(uuid.uuid4())
-computer_name = str(socket.gethostname())
-wandb.init(project="robo-sponge",
-                    name=f'Deform-ContactNet-{computer_name}-{run_id}',
-                    group=f'Deform-ContactNet')
                     
 def parse_args():
     '''PARAMETERS'''
@@ -47,6 +40,8 @@ def parse_args():
     parser.add_argument('--use_normals', action='store_true', default=False, help='use normals')
     parser.add_argument('--process_data', action='store_true', default=False, help='save data offline')
     parser.add_argument('--use_uniform_sample', action='store_true', default=False, help='use uniform sampiling')
+    parser.add_argument('--use_wandb', action='store_true', default=False, help='use wandb')
+
     return parser.parse_args()
 
 def custom_collate(data): #(2)
@@ -216,25 +211,29 @@ def main(args):
     '''TRANING'''
     logger.info('Start training...')
     # Magic
-    wandb.watch(classifier, log_freq=100)
+    if args.use_wandb:
+        wandb.watch(classifier, log_freq=100)
     best_f1 = 0.0
     for epoch in range(start_epoch, args.epoch):
         log_string('Epoch %d (%d/%s):' % (epoch + 1, epoch + 1, args.epoch))
         classifier = classifier.train()
         loss_per_epoch = 0
         f1_score = 0
-        predictions_per_epoch = []
-        target_per_epoch = []
         scheduler.step()
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+            #    Test
+            point_vis = points[0,:,0:3].data.numpy()
+            target_vis = target[0,:].data.numpy().reshape((target.shape[1],1))
+            test_vis_pts = np.hstack((point_vis,target_vis))
+            # --- 
             optimizer.zero_grad()
-
             points = points.data.numpy()
             points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
             points = torch.Tensor(points)
-            points = points.transpose(2, 1)
+            points = points.transpose(2, 1) #For network
+
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
 
@@ -242,16 +241,25 @@ def main(args):
             loss = criterion(pred, target.float(), trans_feat)
             loss.backward()
             optimizer.step()
-            wandb.log({"loss_per_batch": loss.item()})
             loss_per_epoch += loss.item()
             predictions = (pred > 0.5).float()
-            f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target)
+            f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
             f1_score += f1_score_per_batch
-            wandb.log({"f1_score_per_batch": f1_score_per_batch})
+            if args.use_wandb:
+                wandb.log({
+                        "3d point cloud": wandb.Object3D(
+                            {
+                                "type": "lidar/beta",
+                                "points": test_vis_pts,
+                            }
+                        )})
+                wandb.log({"loss_per_batch": loss.item()})
+                wandb.log({"f1_score_per_batch": f1_score_per_batch})
         f1_score /= len(trainDataLoader)
         loss_per_epoch /= len(trainDataLoader)
-        wandb.log({"f1_score_per_epoch": f1_score})
-        wandb.log({"loss_per_epoch": loss_per_epoch})
+        if args.use_wandb:
+            wandb.log({"f1_score_per_epoch": f1_score, "epoch": epoch})
+            wandb.log({"loss_per_epoch": loss_per_epoch, "epoch": epoch})
 
         # print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
         log_string('F1_score: %f' % f1_score)
@@ -300,4 +308,20 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
+    if args.use_wandb:
+        import wandb
+        import uuid
+        import wandb
+        config = dict (
+        learning_rate = args.learning_rate,
+        batch_size = args.batch_size,
+        decay_rate = args.decay_rate,
+        optimizer = str(args.optimizer),
+        )
+        run_id = str(uuid.uuid4())
+        computer_name = str(socket.gethostname())
+        wandb.init(project="robo-sponge",
+                            name=f'Deform-ContactNet-{computer_name}-{run_id}',
+                            group=f'Deform-ContactNet',
+                            config=config)
     main(args)

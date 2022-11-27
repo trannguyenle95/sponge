@@ -47,7 +47,7 @@ def farthest_point_sample(point, npoint):
 
 
 class ModelNetDataLoader(Dataset):
-    def __init__(self, root, split='train',num_point=1000,use_normals=True,use_uniform_sample=True):
+    def __init__(self, root, split='train',num_point=1000,use_normals=True,use_uniform_sample=False):
         self.root = root
         self.npoints = num_point
         self.uniform = use_uniform_sample
@@ -104,12 +104,19 @@ class ModelNetDataLoader(Dataset):
 
 if __name__ == '__main__':
     import torch
-
+    import open3d
     data = ModelNetDataLoader(root='../dataset/', split='train')
     train_dataset, validation_dataset = torch.utils.data.random_split(data,[int(0.8 * len(data)), len(data) - int(0.8 * len(data))], generator=torch.Generator().manual_seed(42))
     DataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=4, shuffle=True)
     for point, label in DataLoader:
         print(point.shape)
         print(label.shape)
-
+        points = point[0,:,0:3].data.numpy()
+        pts_color = np.zeros((points.shape[0],3)) 
+        test = (label[0]*255).reshape((pts_color.shape[0],))
+        pts_color[:,0] = test
+        pcd = open3d.geometry.PointCloud()
+        pcd.points = open3d.utility.Vector3dVector(np.array(points))
+        pcd.colors = open3d.utility.Vector3dVector(np.array(pts_color))
+        open3d.visualization.draw_geometries([pcd]) 
     # Previously rlgpu used Pytorch 1.7.0 

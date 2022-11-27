@@ -102,7 +102,6 @@ class PointNetEncoder(nn.Module):
 
     def forward(self, x):
         B, D, N = x.size()
-        print(B, D ,N)
         trans = self.stn(x)
         x = x.transpose(2, 1)  # [B, N, D]
         if D > 3 :
