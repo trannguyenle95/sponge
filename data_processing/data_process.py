@@ -80,11 +80,22 @@ def main():
             contact_label = np.zeros((target_object_pc_pts.shape[0],1))
             for j in range(target_object_pc_pts.shape[0]):
                 dist = cdist(target_object_pc_pts[j].reshape((1,3)),sponge_position_at_force_contacted_points_all[i])
-                if np.any(dist < 0.005):
+                if np.any(dist < 0.01):
                     contact_label[j] = 1.0       
             
             contact_label_all.append(contact_label)
+        # ==========
+        print(contact_label_all[0].shape)
+        pts_color = np.zeros((target_object_pc_pts.shape[0],3)) 
+        test = (contact_label_all[0]*255).reshape((target_object_pc_pts.shape[0],))
+        print(test.shape)
+        pts_color[:,0] = test
+        pcd = open3d.geometry.PointCloud()
+        pcd.points = open3d.utility.Vector3dVector(np.array(target_object_pc_pts))
+        pcd.colors = open3d.utility.Vector3dVector(np.array(pts_color))
 
+        open3d.visualization.draw_geometries([pcd]) 
+        # ============
         # Construct feature vector 
         feature_vec_all = []
         for i in range(len(press_locations_all)):
