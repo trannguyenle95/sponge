@@ -221,19 +221,19 @@ def main(args):
         f1_score = 0
         scheduler.step()
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
-            #    Test
-            point_vis = points[0,:,0:3].data.numpy()
-            target_vis = target[0,:].data.numpy().reshape((target.shape[1],1))
-            test_vis_pts = np.hstack((point_vis,target_vis))
-            print(point_vis.shape,target_vis.shape, test_vis_pts.shape)
-            # --- 
             optimizer.zero_grad()
             points = points.data.numpy()
             points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
+            point_vis = points[0,:,0:3]
             points = torch.Tensor(points)
             points = points.transpose(2, 1) #For network
+
+            #    Ground_truth vis
+            target_vis = target[0,:].data.numpy().reshape((target.shape[1],1))
+            ground_truth_vis = np.hstack((point_vis,target_vis))
+            # --- 
 
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
@@ -245,18 +245,30 @@ def main(args):
             loss_per_epoch += loss.item()
             predictions = (pred > 0.5).float()
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
-            print(pred, predictions)
             f1_score += f1_score_per_batch
+            #    Ground_truth vis
+            pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
+            prediction_vis = np.hstack((point_vis,pred_vis))
+            # --- 
+            print(batch_id)
             if args.use_wandb:
-                wandb.log({
-                        "3d point cloud": wandb.Object3D(
-                            {
-                                "type": "lidar/beta",
-                                "points": test_vis_pts,
-                            }
-                        )})
-                wandb.log({"loss_per_batch": loss.item()})
-                wandb.log({"f1_score_per_batch": f1_score_per_batch})
+                if batch_id % 10:
+                    wandb.log({
+                            "Ground_truth": wandb.Object3D(
+                                {
+                                    "type": "lidar/beta",
+                                    "points": ground_truth_vis,
+                                }
+                            )})
+                    wandb.log({
+                            "Prediction": wandb.Object3D(
+                                {
+                                    "type": "lidar/beta",
+                                    "points": prediction_vis,
+                                }
+                            )})
+                    wandb.log({"loss_per_batch": loss.item()})
+                    wandb.log({"f1_score_per_batch": f1_score_per_batch})
         f1_score /= len(trainDataLoader)
         loss_per_epoch /= len(trainDataLoader)
         if args.use_wandb:

@@ -574,3 +574,261 @@
 2022-11-27 17:03:18,873 - Model - INFO - Save model...
 2022-11-27 17:03:18,873 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
 2022-11-27 17:03:18,938 - Model - INFO - Epoch 15 (15/200):
+2022-11-27 17:14:18,109 - Model - INFO - PARAMETER ...
+2022-11-27 17:14:18,109 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:14:18,109 - Model - INFO - Load dataset ...
+2022-11-27 17:14:19,707 - Model - INFO - Use pretrain model
+2022-11-27 17:14:19,708 - Model - INFO - Start training...
+2022-11-27 17:14:19,710 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:15:26,011 - Model - INFO - PARAMETER ...
+2022-11-27 17:15:26,011 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:15:26,011 - Model - INFO - Load dataset ...
+2022-11-27 17:15:27,410 - Model - INFO - Use pretrain model
+2022-11-27 17:15:27,411 - Model - INFO - Start training...
+2022-11-27 17:15:27,412 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:16:16,382 - Model - INFO - PARAMETER ...
+2022-11-27 17:16:16,382 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:16:16,383 - Model - INFO - Load dataset ...
+2022-11-27 17:16:17,853 - Model - INFO - Use pretrain model
+2022-11-27 17:16:17,854 - Model - INFO - Start training...
+2022-11-27 17:16:17,856 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:16:49,207 - Model - INFO - PARAMETER ...
+2022-11-27 17:16:49,207 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:16:49,208 - Model - INFO - Load dataset ...
+2022-11-27 17:16:50,641 - Model - INFO - Use pretrain model
+2022-11-27 17:16:50,642 - Model - INFO - Start training...
+2022-11-27 17:16:50,644 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:17:30,513 - Model - INFO - PARAMETER ...
+2022-11-27 17:17:30,513 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:17:30,513 - Model - INFO - Load dataset ...
+2022-11-27 17:17:31,933 - Model - INFO - Use pretrain model
+2022-11-27 17:17:31,934 - Model - INFO - Start training...
+2022-11-27 17:17:31,935 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:18:13,312 - Model - INFO - PARAMETER ...
+2022-11-27 17:18:13,312 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:18:13,312 - Model - INFO - Load dataset ...
+2022-11-27 17:18:14,704 - Model - INFO - Use pretrain model
+2022-11-27 17:18:14,706 - Model - INFO - Start training...
+2022-11-27 17:18:14,707 - Model - INFO - Epoch 14 (14/200):
+2022-11-27 17:18:15,496 - Model - INFO - F1_score: 0.084377
+2022-11-27 17:18:15,496 - Model - INFO - Save model...
+2022-11-27 17:18:15,496 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:18:15,570 - Model - INFO - Epoch 15 (15/200):
+2022-11-27 17:18:16,059 - Model - INFO - F1_score: 0.147635
+2022-11-27 17:18:16,059 - Model - INFO - Save model...
+2022-11-27 17:18:16,059 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:18:16,131 - Model - INFO - Epoch 16 (16/200):
+2022-11-27 17:18:16,657 - Model - INFO - F1_score: 0.110045
+2022-11-27 17:18:16,657 - Model - INFO - Epoch 17 (17/200):
+2022-11-27 17:18:17,190 - Model - INFO - F1_score: 0.082937
+2022-11-27 17:18:17,190 - Model - INFO - Epoch 18 (18/200):
+2022-11-27 17:18:17,677 - Model - INFO - F1_score: 0.019725
+2022-11-27 17:18:17,677 - Model - INFO - Epoch 19 (19/200):
+2022-11-27 17:18:18,204 - Model - INFO - F1_score: 0.006401
+2022-11-27 17:18:18,204 - Model - INFO - Epoch 20 (20/200):
+2022-11-27 17:18:18,704 - Model - INFO - F1_score: 0.000000
+2022-11-27 17:18:18,704 - Model - INFO - Epoch 21 (21/200):
+2022-11-27 17:18:19,265 - Model - INFO - F1_score: 0.043964
+2022-11-27 17:18:19,266 - Model - INFO - Epoch 22 (22/200):
+2022-11-27 17:18:19,829 - Model - INFO - F1_score: 0.000000
+2022-11-27 17:18:19,830 - Model - INFO - Epoch 23 (23/200):
+2022-11-27 17:18:20,342 - Model - INFO - F1_score: 0.000713
+2022-11-27 17:18:20,342 - Model - INFO - Epoch 24 (24/200):
+2022-11-27 17:18:20,836 - Model - INFO - F1_score: 0.182846
+2022-11-27 17:18:20,836 - Model - INFO - Save model...
+2022-11-27 17:18:20,836 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:18:20,901 - Model - INFO - Epoch 25 (25/200):
+2022-11-27 17:20:44,223 - Model - INFO - PARAMETER ...
+2022-11-27 17:20:44,223 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:20:44,224 - Model - INFO - Load dataset ...
+2022-11-27 17:20:45,720 - Model - INFO - Use pretrain model
+2022-11-27 17:20:45,721 - Model - INFO - Start training...
+2022-11-27 17:20:45,722 - Model - INFO - Epoch 24 (24/200):
+2022-11-27 17:20:46,390 - Model - INFO - F1_score: 0.058883
+2022-11-27 17:20:46,391 - Model - INFO - Save model...
+2022-11-27 17:20:46,391 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:46,479 - Model - INFO - Epoch 25 (25/200):
+2022-11-27 17:20:46,818 - Model - INFO - F1_score: 0.485298
+2022-11-27 17:20:46,818 - Model - INFO - Save model...
+2022-11-27 17:20:46,818 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:46,893 - Model - INFO - Epoch 26 (26/200):
+2022-11-27 17:20:47,259 - Model - INFO - F1_score: 0.339593
+2022-11-27 17:20:47,259 - Model - INFO - Epoch 27 (27/200):
+2022-11-27 17:20:47,635 - Model - INFO - F1_score: 0.053454
+2022-11-27 17:20:47,635 - Model - INFO - Epoch 28 (28/200):
+2022-11-27 17:20:47,976 - Model - INFO - F1_score: 0.136611
+2022-11-27 17:20:47,976 - Model - INFO - Epoch 29 (29/200):
+2022-11-27 17:20:48,320 - Model - INFO - F1_score: 0.607170
+2022-11-27 17:20:48,320 - Model - INFO - Save model...
+2022-11-27 17:20:48,320 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:48,384 - Model - INFO - Epoch 30 (30/200):
+2022-11-27 17:20:48,731 - Model - INFO - F1_score: 0.584185
+2022-11-27 17:20:48,732 - Model - INFO - Epoch 31 (31/200):
+2022-11-27 17:20:49,066 - Model - INFO - F1_score: 0.506183
+2022-11-27 17:20:49,066 - Model - INFO - Epoch 32 (32/200):
+2022-11-27 17:20:49,428 - Model - INFO - F1_score: 0.636056
+2022-11-27 17:20:49,428 - Model - INFO - Save model...
+2022-11-27 17:20:49,428 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:49,498 - Model - INFO - Epoch 33 (33/200):
+2022-11-27 17:20:49,835 - Model - INFO - F1_score: 0.585723
+2022-11-27 17:20:49,835 - Model - INFO - Epoch 34 (34/200):
+2022-11-27 17:20:50,158 - Model - INFO - F1_score: 0.376376
+2022-11-27 17:20:50,158 - Model - INFO - Epoch 35 (35/200):
+2022-11-27 17:20:50,481 - Model - INFO - F1_score: 0.075676
+2022-11-27 17:20:50,482 - Model - INFO - Epoch 36 (36/200):
+2022-11-27 17:20:50,819 - Model - INFO - F1_score: 0.502098
+2022-11-27 17:20:50,819 - Model - INFO - Epoch 37 (37/200):
+2022-11-27 17:20:51,136 - Model - INFO - F1_score: 0.533275
+2022-11-27 17:20:51,136 - Model - INFO - Epoch 38 (38/200):
+2022-11-27 17:20:51,477 - Model - INFO - F1_score: 0.384464
+2022-11-27 17:20:51,477 - Model - INFO - Epoch 39 (39/200):
+2022-11-27 17:20:51,817 - Model - INFO - F1_score: 0.670734
+2022-11-27 17:20:51,817 - Model - INFO - Save model...
+2022-11-27 17:20:51,817 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:51,880 - Model - INFO - Epoch 40 (40/200):
+2022-11-27 17:20:52,204 - Model - INFO - F1_score: 0.690670
+2022-11-27 17:20:52,204 - Model - INFO - Save model...
+2022-11-27 17:20:52,204 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:52,266 - Model - INFO - Epoch 41 (41/200):
+2022-11-27 17:20:52,589 - Model - INFO - F1_score: 0.645695
+2022-11-27 17:20:52,590 - Model - INFO - Epoch 42 (42/200):
+2022-11-27 17:20:52,910 - Model - INFO - F1_score: 0.328441
+2022-11-27 17:20:52,910 - Model - INFO - Epoch 43 (43/200):
+2022-11-27 17:20:53,228 - Model - INFO - F1_score: 0.199755
+2022-11-27 17:20:53,228 - Model - INFO - Epoch 44 (44/200):
+2022-11-27 17:20:53,548 - Model - INFO - F1_score: 0.433753
+2022-11-27 17:20:53,549 - Model - INFO - Epoch 45 (45/200):
+2022-11-27 17:20:53,866 - Model - INFO - F1_score: 0.454962
+2022-11-27 17:20:53,867 - Model - INFO - Epoch 46 (46/200):
+2022-11-27 17:20:54,192 - Model - INFO - F1_score: 0.522466
+2022-11-27 17:20:54,192 - Model - INFO - Epoch 47 (47/200):
+2022-11-27 17:20:54,530 - Model - INFO - F1_score: 0.177301
+2022-11-27 17:20:54,530 - Model - INFO - Epoch 48 (48/200):
+2022-11-27 17:20:54,864 - Model - INFO - F1_score: 0.441376
+2022-11-27 17:20:54,864 - Model - INFO - Epoch 49 (49/200):
+2022-11-27 17:20:55,214 - Model - INFO - F1_score: 0.684371
+2022-11-27 17:20:55,214 - Model - INFO - Epoch 50 (50/200):
+2022-11-27 17:20:55,544 - Model - INFO - F1_score: 0.312867
+2022-11-27 17:20:55,544 - Model - INFO - Epoch 51 (51/200):
+2022-11-27 17:20:55,890 - Model - INFO - F1_score: 0.099105
+2022-11-27 17:20:55,890 - Model - INFO - Epoch 52 (52/200):
+2022-11-27 17:20:56,229 - Model - INFO - F1_score: 0.693333
+2022-11-27 17:20:56,229 - Model - INFO - Save model...
+2022-11-27 17:20:56,229 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:20:56,296 - Model - INFO - Epoch 53 (53/200):
+2022-11-27 17:20:56,679 - Model - INFO - F1_score: 0.629329
+2022-11-27 17:20:56,679 - Model - INFO - Epoch 54 (54/200):
+2022-11-27 17:20:57,056 - Model - INFO - F1_score: 0.095612
+2022-11-27 17:20:57,056 - Model - INFO - Epoch 55 (55/200):
+2022-11-27 17:20:57,393 - Model - INFO - F1_score: 0.678843
+2022-11-27 17:20:57,393 - Model - INFO - Epoch 56 (56/200):
+2022-11-27 17:20:57,724 - Model - INFO - F1_score: 0.243258
+2022-11-27 17:20:57,724 - Model - INFO - Epoch 57 (57/200):
+2022-11-27 17:20:58,062 - Model - INFO - F1_score: 0.375439
+2022-11-27 17:20:58,063 - Model - INFO - Epoch 58 (58/200):
+2022-11-27 17:20:58,387 - Model - INFO - F1_score: 0.403008
+2022-11-27 17:20:58,387 - Model - INFO - Epoch 59 (59/200):
+2022-11-27 17:20:58,724 - Model - INFO - F1_score: 0.427676
+2022-11-27 17:20:58,724 - Model - INFO - Epoch 60 (60/200):
+2022-11-27 17:20:59,071 - Model - INFO - F1_score: 0.654767
+2022-11-27 17:20:59,071 - Model - INFO - Epoch 61 (61/200):
+2022-11-27 17:20:59,398 - Model - INFO - F1_score: 0.241420
+2022-11-27 17:20:59,398 - Model - INFO - Epoch 62 (62/200):
+2022-11-27 17:20:59,731 - Model - INFO - F1_score: 0.545542
+2022-11-27 17:20:59,732 - Model - INFO - Epoch 63 (63/200):
+2022-11-27 17:21:00,070 - Model - INFO - F1_score: 0.289635
+2022-11-27 17:21:00,070 - Model - INFO - Epoch 64 (64/200):
+2022-11-27 17:21:00,390 - Model - INFO - F1_score: 0.380638
+2022-11-27 17:21:00,391 - Model - INFO - Epoch 65 (65/200):
+2022-11-27 17:21:00,709 - Model - INFO - F1_score: 0.718002
+2022-11-27 17:21:00,709 - Model - INFO - Save model...
+2022-11-27 17:21:00,709 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:21:00,771 - Model - INFO - Epoch 66 (66/200):
+2022-11-27 17:21:01,100 - Model - INFO - F1_score: 0.264747
+2022-11-27 17:21:01,100 - Model - INFO - Epoch 67 (67/200):
+2022-11-27 17:21:01,438 - Model - INFO - F1_score: 0.709182
+2022-11-27 17:21:01,438 - Model - INFO - Epoch 68 (68/200):
+2022-11-27 17:21:01,779 - Model - INFO - F1_score: 0.498904
+2022-11-27 17:21:01,779 - Model - INFO - Epoch 69 (69/200):
+2022-11-27 17:21:02,111 - Model - INFO - F1_score: 0.067344
+2022-11-27 17:21:02,111 - Model - INFO - Epoch 70 (70/200):
+2022-11-27 17:21:02,452 - Model - INFO - F1_score: 0.690377
+2022-11-27 17:21:02,452 - Model - INFO - Epoch 71 (71/200):
+2022-11-27 17:21:02,787 - Model - INFO - F1_score: 0.397171
+2022-11-27 17:21:02,788 - Model - INFO - Epoch 72 (72/200):
+2022-11-27 17:21:03,118 - Model - INFO - F1_score: 0.393729
+2022-11-27 17:21:03,118 - Model - INFO - Epoch 73 (73/200):
+2022-11-27 17:21:03,441 - Model - INFO - F1_score: 0.732971
+2022-11-27 17:21:03,441 - Model - INFO - Save model...
+2022-11-27 17:21:03,441 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:21:03,505 - Model - INFO - Epoch 74 (74/200):
+2022-11-27 17:21:03,834 - Model - INFO - F1_score: 0.608025
+2022-11-27 17:21:03,834 - Model - INFO - Epoch 75 (75/200):
+2022-11-27 17:21:04,165 - Model - INFO - F1_score: 0.232732
+2022-11-27 17:21:04,165 - Model - INFO - Epoch 76 (76/200):
+2022-11-27 17:21:04,496 - Model - INFO - F1_score: 0.497489
+2022-11-27 17:21:04,496 - Model - INFO - Epoch 77 (77/200):
+2022-11-27 17:21:04,818 - Model - INFO - F1_score: 0.759085
+2022-11-27 17:21:04,819 - Model - INFO - Save model...
+2022-11-27 17:21:04,819 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:21:04,881 - Model - INFO - Epoch 78 (78/200):
+2022-11-27 17:21:05,198 - Model - INFO - F1_score: 0.505623
+2022-11-27 17:21:05,198 - Model - INFO - Epoch 79 (79/200):
+2022-11-27 17:21:05,516 - Model - INFO - F1_score: 0.412589
+2022-11-27 17:21:05,516 - Model - INFO - Epoch 80 (80/200):
+2022-11-27 17:21:05,842 - Model - INFO - F1_score: 0.693749
+2022-11-27 17:21:05,842 - Model - INFO - Epoch 81 (81/200):
+2022-11-27 17:21:06,161 - Model - INFO - F1_score: 0.572373
+2022-11-27 17:21:06,161 - Model - INFO - Epoch 82 (82/200):
+2022-11-27 17:21:06,478 - Model - INFO - F1_score: 0.688020
+2022-11-27 17:21:06,478 - Model - INFO - Epoch 83 (83/200):
+2022-11-27 17:21:06,796 - Model - INFO - F1_score: 0.715427
+2022-11-27 17:21:06,796 - Model - INFO - Epoch 84 (84/200):
+2022-11-27 17:21:07,140 - Model - INFO - F1_score: 0.486463
+2022-11-27 17:21:07,140 - Model - INFO - Epoch 85 (85/200):
+2022-11-27 17:21:07,483 - Model - INFO - F1_score: 0.639253
+2022-11-27 17:21:07,484 - Model - INFO - Epoch 86 (86/200):
+2022-11-27 17:21:07,822 - Model - INFO - F1_score: 0.508776
+2022-11-27 17:21:07,822 - Model - INFO - Epoch 87 (87/200):
+2022-11-27 17:21:08,166 - Model - INFO - F1_score: 0.611792
+2022-11-27 17:21:08,166 - Model - INFO - Epoch 88 (88/200):
+2022-11-27 17:21:08,505 - Model - INFO - F1_score: 0.126631
+2022-11-27 17:21:08,505 - Model - INFO - Epoch 89 (89/200):
+2022-11-27 17:21:08,870 - Model - INFO - F1_score: 0.703925
+2022-11-27 17:21:08,871 - Model - INFO - Epoch 90 (90/200):
+2022-11-27 17:21:09,252 - Model - INFO - F1_score: 0.299574
+2022-11-27 17:21:09,253 - Model - INFO - Epoch 91 (91/200):
+2022-11-27 17:21:09,590 - Model - INFO - F1_score: 0.192649
+2022-11-27 17:21:09,590 - Model - INFO - Epoch 92 (92/200):
+2022-11-27 17:21:09,962 - Model - INFO - F1_score: 0.665193
+2022-11-27 17:21:09,962 - Model - INFO - Epoch 93 (93/200):
+2022-11-27 17:21:10,300 - Model - INFO - F1_score: 0.365256
+2022-11-27 17:21:10,300 - Model - INFO - Epoch 94 (94/200):
+2022-11-27 17:21:10,633 - Model - INFO - F1_score: 0.522249
+2022-11-27 17:21:10,634 - Model - INFO - Epoch 95 (95/200):
+2022-11-27 17:21:10,985 - Model - INFO - F1_score: 0.662480
+2022-11-27 17:21:10,985 - Model - INFO - Epoch 96 (96/200):
+2022-11-27 17:21:11,337 - Model - INFO - F1_score: 0.544434
+2022-11-27 17:21:11,337 - Model - INFO - Epoch 97 (97/200):
+2022-11-27 17:21:11,669 - Model - INFO - F1_score: 0.659130
+2022-11-27 17:21:11,670 - Model - INFO - Epoch 98 (98/200):
+2022-11-27 17:21:33,514 - Model - INFO - PARAMETER ...
+2022-11-27 17:21:33,514 - Model - INFO - Namespace(batch_size=2, decay_rate=0.0001, epoch=200, gpu='0', learning_rate=0.001, log_dir='deform_contactnet', model='deform_contactnet', num_category=1, num_point=1024, optimizer='Adam', process_data=False, use_cpu=False, use_normals=True, use_uniform_sample=False, use_wandb=True)
+2022-11-27 17:21:33,514 - Model - INFO - Load dataset ...
+2022-11-27 17:21:34,935 - Model - INFO - Use pretrain model
+2022-11-27 17:21:34,936 - Model - INFO - Start training...
+2022-11-27 17:21:34,937 - Model - INFO - Epoch 77 (77/200):
+2022-11-27 17:21:35,596 - Model - INFO - F1_score: 0.743432
+2022-11-27 17:21:35,597 - Model - INFO - Save model...
+2022-11-27 17:21:35,597 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:21:35,665 - Model - INFO - Epoch 78 (78/200):
+2022-11-27 17:21:36,003 - Model - INFO - F1_score: 0.167892
+2022-11-27 17:21:36,003 - Model - INFO - Epoch 79 (79/200):
+2022-11-27 17:21:36,342 - Model - INFO - F1_score: 0.465722
+2022-11-27 17:21:36,342 - Model - INFO - Epoch 80 (80/200):
+2022-11-27 17:21:36,667 - Model - INFO - F1_score: 0.750971
+2022-11-27 17:21:36,667 - Model - INFO - Save model...
+2022-11-27 17:21:36,667 - Model - INFO - Saving at log/classification/deform_contactnet/checkpoints/best_model.pth
+2022-11-27 17:21:36,732 - Model - INFO - Epoch 81 (81/200):
+2022-11-27 17:21:37,062 - Model - INFO - F1_score: 0.737255
+2022-11-27 17:21:37,062 - Model - INFO - Epoch 82 (82/200):
