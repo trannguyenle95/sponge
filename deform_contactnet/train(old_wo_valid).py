@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument('--num_category', default=1, type=int,  help='training on ModelNet10/40')
     parser.add_argument('--epoch', default=200, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
+    parser.add_argument('--trainval_split', default=0.7, type=float, help='Split percent train&val')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number')
     parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer for training')
     parser.add_argument('--log_dir', type=str, default=None, help='experiment root')
@@ -47,8 +48,8 @@ def parse_args():
 def custom_collate(data): #(2)
     point = [torch.tensor(d[0]) for d in data] #(3)
     label = [torch.tensor(d[1]) for d in data]
-    point = pad_sequence(point, batch_first=True, padding_value=0) #(4)
-    label = pad_sequence(label, batch_first=True, padding_value=0) #(4)
+    point = pad_sequence(point, batch_first=True, padding_value=0.0) #(4)
+    label = pad_sequence(label, batch_first=True, padding_value=0.0) #(4)
     return point,label
 
 def f1_confusion(prediction, truth):
@@ -171,7 +172,7 @@ def main(args):
     data_path = 'dataset/'
 
     trainval_dataset = ModelNetDataLoader(root=data_path, split='train')
-    train_dataset_percentage = 0.7
+    train_dataset_percentage = args.trainval_split
     train_dataset, validation_dataset = torch.utils.data.random_split(trainval_dataset,[int(train_dataset_percentage * len(trainval_dataset)), len(trainval_dataset) - int(train_dataset_percentage * len(trainval_dataset))], generator=torch.Generator().manual_seed(42))
     # test_dataset = ModelNetDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
 
@@ -225,21 +226,22 @@ def main(args):
     # Magic
     if args.use_wandb:
         wandb.watch(classifier, log_freq=100)
+    best_f1 = 0.0
     for epoch in range(start_epoch, args.epoch):
-        log_string('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
+        log_string('Epoch %d (%d/%s):' % (epoch + 1, epoch + 1, args.epoch))
         classifier = classifier.train()
         loss_per_epoch = 0
-        f1_score_train = 0
+        f1_score = 0
         scheduler.step()
-        
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             optimizer.zero_grad()
             points = points.data.numpy()
             # points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
+            point_vis = points[0,:,0:3]
             points = torch.Tensor(points)
-            points = points.transpose(2, 1) #For networ
+            points = points.transpose(2, 1) #For network
 
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
@@ -248,43 +250,87 @@ def main(args):
             loss = criterion(pred, target.float(), trans_feat)
             loss.backward()
             optimizer.step()
-            global_step += 1
+            loss_per_epoch += loss.item()
             predictions = (pred > 0.5).float()
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
-            f1_score_train += f1_score_per_batch
-            loss_per_epoch += loss.item()
-            # --- 
+            f1_score += f1_score_per_batch
             if args.use_wandb:
-                wandb.log({"loss_per_batch": loss.item()})
-                wandb.log({"f1_score_per_batch": f1_score_per_batch})
-        f1_score_train /= len(trainDataLoader)
+                wandb.log({"loss_every_per_batch": loss.item()})
+                wandb.log({"f1_score_every_per_batch": f1_score_per_batch})
+            if args.use_wandb:
+                if (batch_id%250==0):
+                    #    Ground_truth vis
+                    target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
+                    ground_truth_vis = np.hstack((point_vis,target_vis))
+                    # --- 
+                    #    Prediction vis
+                    pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
+                    prediction_vis = np.hstack((point_vis,pred_vis))
+                    # --- 
+                    wandb.log({
+                        "Ground_truth": wandb.Object3D(
+                            {
+                                "type": "lidar/beta",
+                                "points": ground_truth_vis,
+                            }
+                        )})
+                    wandb.log({
+                        "Prediction": wandb.Object3D(
+                            {
+                                "type": "lidar/beta",
+                                "points": prediction_vis,
+                            }
+                        )})
+                else:
+                    pass
+        
+        f1_score /= len(trainDataLoader)
         loss_per_epoch /= len(trainDataLoader)
         if args.use_wandb:
-            wandb.log({"Training/Train_f1_score_per_epoch": f1_score_train, "epoch": epoch})
-            wandb.log({"Training/Train_loss_per_epoch": loss_per_epoch, "epoch": epoch})
+            wandb.log({"Training/f1_score_per_epoch": f1_score, "epoch": epoch})
+            wandb.log({"Training/loss_per_epoch": loss_per_epoch, "epoch": epoch})
 
-        log_string('F1_score: %f' % f1_score_train)  
-
-        with torch.no_grad():
-            val_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
-            if (val_acc >= best_val_acc):
-                best_val_acc = val_acc
-                best_epoch = epoch + 1
-            if args.use_wandb:
-                wandb.log({"Validation/Valid_f1_score_per_epoch": val_acc,"epoch": epoch})
-
-            if (val_acc >= best_val_acc):
+        # print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
+        log_string('F1_score: %f' % f1_score)
+        if (f1_score >= best_f1):
+                best_f1 = f1_score
                 logger.info('Save model...')
                 savepath = str(checkpoints_dir) + '/best_model.pth'
                 log_string('Saving at %s' % savepath)
                 state = {
-                    'epoch': best_epoch,
-                    'val_acc': val_acc,
+                    'epoch': epoch,
+                    'f1_score': f1_score,
                     'model_state_dict': classifier.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                 }
                 torch.save(state, savepath)
-            global_epoch += 1
+                
+
+        # with torch.no_grad():
+        #     instance_acc, class_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
+
+        #     if (instance_acc >= best_instance_acc):
+        #         best_instance_acc = instance_acc
+        #         best_epoch = epoch + 1
+
+        #     if (class_acc >= best_class_acc):
+        #         best_class_acc = class_acc
+        #     log_string('Test Instance Accuracy: %f, Class Accuracy: %f' % (instance_acc, class_acc))
+        #     log_string('Best Instance Accuracy: %f, Class Accuracy: %f' % (best_instance_acc, best_class_acc))
+
+        #     if (instance_acc >= best_instance_acc):
+        #         logger.info('Save model...')
+        #         savepath = str(checkpoints_dir) + '/best_model.pth'
+        #         log_string('Saving at %s' % savepath)
+        #         state = {
+        #             'epoch': best_epoch,
+        #             'instance_acc': instance_acc,
+        #             'class_acc': class_acc,
+        #             'model_state_dict': classifier.state_dict(),
+        #             'optimizer_state_dict': optimizer.state_dict(),
+        #         }
+        #         torch.save(state, savepath)
+        #     global_epoch += 1
 
     logger.info('End of training...')
 

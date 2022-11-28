@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument('--num_category', default=1, type=int,  help='training on ModelNet10/40')
     parser.add_argument('--epoch', default=200, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
+    parser.add_argument('--trainval_split', default=0.7, type=float, help='Split percent train&val')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number')
     parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer for training')
     parser.add_argument('--log_dir', type=str, default=None, help='experiment root')
@@ -91,32 +92,45 @@ def inplace_relu(m):
 
 
 def test(model, loader, num_class=1):
-    mean_correct = []
-    class_acc = np.zeros((num_class, 3))
     classifier = model.eval()
-
+    f1_score_val = 0
     for j, (points, target) in tqdm(enumerate(loader), total=len(loader)):
-
+        point_vis = points[0,:,0:3] #For vis
         if not args.use_cpu:
             points, target = points.cuda(), target.cuda()
 
         points = points.transpose(2, 1)
         pred, _ = classifier(points)
-        pred_choice = pred.data.max(0)[0]
+        predictions = (pred > 0.5).float()
+        f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
+        f1_score_val += f1_score_per_batch
 
-        for cat in np.unique(target.cpu()):
-            classacc = pred_choice[target == cat].eq(target[target == cat].long().data).cpu().sum()
-            class_acc[cat, 0] += classacc.item() / float(points[target == cat].size()[0])
-            class_acc[cat, 1] += 1
+        #    Ground_truth vis
+        pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
+        prediction_vis = np.hstack((point_vis,pred_vis))
 
-        correct = pred_choice.eq(target.long().data).cpu().sum()
-        mean_correct.append(correct.item() / float(points.size()[0]))
+        #    Ground_truth vis
+        target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
+        ground_truth_vis = np.hstack((point_vis,target_vis))
+        # --- 
+    val_acc = f1_score_val/len(loader)
+    if args.use_wandb:
+        wandb.log({
+                "Ground_truth": wandb.Object3D(
+                    {
+                        "type": "lidar/beta",
+                        "points": ground_truth_vis,
+                    }
+                )})
+        wandb.log({
+                "Prediction": wandb.Object3D(
+                    {
+                        "type": "lidar/beta",
+                        "points": prediction_vis,
+                    }
+                )})
 
-    class_acc[:, 2] = class_acc[:, 0] / class_acc[:, 1]
-    class_acc = np.mean(class_acc[:, 2])
-    instance_acc = np.mean(mean_correct)
-
-    return instance_acc, class_acc
+    return val_acc
 
 
 def main(args):
@@ -160,7 +174,7 @@ def main(args):
     data_path = 'dataset/'
 
     trainval_dataset = ModelNetDataLoader(root=data_path, split='train')
-    train_dataset_percentage = 0.8
+    train_dataset_percentage = args.trainval_split
     train_dataset, validation_dataset = torch.utils.data.random_split(trainval_dataset,[int(train_dataset_percentage * len(trainval_dataset)), len(trainval_dataset) - int(train_dataset_percentage * len(trainval_dataset))], generator=torch.Generator().manual_seed(42))
     # test_dataset = ModelNetDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
 
@@ -219,22 +233,20 @@ def main(args):
         if isinstance(m, torch.nn.BatchNorm2d) or isinstance(m, torch.nn.BatchNorm1d):
             m.momentum = momentum
 
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.7)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.7)
     LEARNING_RATE_CLIP = 1e-5
     MOMENTUM_ORIGINAL = 0.1
     MOMENTUM_DECCAY = 0.5
     MOMENTUM_DECCAY_STEP = args.step_size
     global_epoch = 0
     global_step = 0
-    best_instance_acc = 0.0
-    best_class_acc = 0.0
+    best_val_acc = 0.0
 
     '''TRANING'''
     logger.info('Start training...')
     # Magic
     if args.use_wandb:
         wandb.watch(classifier, log_freq=100)
-    best_f1 = 0.0
     for epoch in range(start_epoch, args.epoch):
         log_string('Epoch %d (%d/%s):' % (epoch + 1, epoch + 1, args.epoch))
         lr = max(args.learning_rate * (args.lr_decay ** (epoch // args.step_size)), LEARNING_RATE_CLIP)
@@ -249,7 +261,7 @@ def main(args):
         num_batches = len(trainDataLoader)
         classifier = classifier.train()
         loss_per_epoch = 0
-        f1_score = 0
+        f1_score_train = 0
         # scheduler.step()
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             optimizer.zero_grad()
@@ -257,99 +269,52 @@ def main(args):
             # points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
-            point_vis = points[0,:,0:3]
             points = torch.Tensor(points)
             points = points.transpose(2, 1) #For network
             if not args.use_cpu:
                 points, target = points.cuda(), target.cuda()
 
             pred, trans_feat = classifier(points)
-            print(pred.shape)
             loss = criterion(pred, target.float(), trans_feat)
-
             loss.backward()
             optimizer.step()
-            loss_per_epoch += loss.item()
+            global_step += 1
             predictions = (pred > 0.5).float()
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
-            f1_score += f1_score_per_batch
+            f1_score_train += f1_score_per_batch
+            loss_per_epoch += loss.item()
+
             if args.use_wandb:
-                wandb.log({"loss_every_per_batch": loss.item()})
-                wandb.log({"f1_score_every_per_batch": f1_score_per_batch})
-            if args.use_wandb:
-                if (batch_id%250==0):
-                    #    Ground_truth vis
-                    target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
-                    ground_truth_vis = np.hstack((point_vis,target_vis))
-                    # --- 
-                    #    Prediction vis
-                    pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
-                    prediction_vis = np.hstack((point_vis,pred_vis))
-                    # --- 
-                    wandb.log({
-                        "Ground_truth": wandb.Object3D(
-                            {
-                                "type": "lidar/beta",
-                                "points": ground_truth_vis,
-                            }
-                        )})
-                    wandb.log({
-                        "Prediction": wandb.Object3D(
-                            {
-                                "type": "lidar/beta",
-                                "points": prediction_vis,
-                            }
-                        )})
-                else:
-                    pass
-        
-        f1_score /= num_batches
+                wandb.log({"loss_per_batch": loss.item()})
+                wandb.log({"f1_score_per_batch": f1_score_per_batch})
+
+        f1_score_train /= num_batches
         loss_per_epoch /= num_batches
         if args.use_wandb:
-            wandb.log({"Training/f1_score_per_epoch": f1_score, "epoch": epoch})
-            wandb.log({"Training/loss_per_epoch": loss_per_epoch, "epoch": epoch})
+            wandb.log({"Training/Train_f1_score_per_epoch": f1_score_train, "epoch": epoch})
+            wandb.log({"Training/Train_loss_per_epoch": loss_per_epoch, "epoch": epoch})
+        log_string('F1_score: %f' % f1_score_train)  
+                
+        with torch.no_grad():
+            val_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
+            if (val_acc >= best_val_acc):
+                best_val_acc = val_acc
+                best_epoch = epoch + 1
+            if args.use_wandb:
+                wandb.log({"Validation/Valid_f1_score_per_epoch": val_acc,"epoch": epoch})
 
-        # print("Got TP: {} / NG: {} with f1_score {}".format(tp, fp, f1_score))
-        log_string('F1_score: %f' % f1_score)
-        if (f1_score >= best_f1):
-                best_f1 = f1_score
+            if (val_acc >= best_val_acc):
                 logger.info('Save model...')
                 savepath = str(checkpoints_dir) + '/best_model.pth'
                 log_string('Saving at %s' % savepath)
                 state = {
-                    'epoch': epoch,
-                    'f1_score': f1_score,
+                    'epoch': best_epoch,
+                    'val_acc': val_acc,
                     'model_state_dict': classifier.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
                 }
                 torch.save(state, savepath)
-                
-
-        # with torch.no_grad():
-        #     instance_acc, class_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
-
-        #     if (instance_acc >= best_instance_acc):
-        #         best_instance_acc = instance_acc
-        #         best_epoch = epoch + 1
-
-        #     if (class_acc >= best_class_acc):
-        #         best_class_acc = class_acc
-        #     log_string('Test Instance Accuracy: %f, Class Accuracy: %f' % (instance_acc, class_acc))
-        #     log_string('Best Instance Accuracy: %f, Class Accuracy: %f' % (best_instance_acc, best_class_acc))
-
-        #     if (instance_acc >= best_instance_acc):
-        #         logger.info('Save model...')
-        #         savepath = str(checkpoints_dir) + '/best_model.pth'
-        #         log_string('Saving at %s' % savepath)
-        #         state = {
-        #             'epoch': best_epoch,
-        #             'instance_acc': instance_acc,
-        #             'class_acc': class_acc,
-        #             'model_state_dict': classifier.state_dict(),
-        #             'optimizer_state_dict': optimizer.state_dict(),
-        #         }
-        #         torch.save(state, savepath)
-        #     global_epoch += 1
+            global_epoch += 1
 
     logger.info('End of training...')
 
