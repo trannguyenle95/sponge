@@ -171,7 +171,7 @@ def main(args):
     data_path = 'dataset/'
 
     trainval_dataset = ModelNetDataLoader(root=data_path, split='train')
-    train_dataset_percentage = 0.6
+    train_dataset_percentage = 0.7
     train_dataset, validation_dataset = torch.utils.data.random_split(trainval_dataset,[int(train_dataset_percentage * len(trainval_dataset)), len(trainval_dataset) - int(train_dataset_percentage * len(trainval_dataset))], generator=torch.Generator().manual_seed(42))
     # test_dataset = ModelNetDataLoader(root=data_path, args=args, split='test', process_data=args.process_data)
 
@@ -235,8 +235,7 @@ def main(args):
         for batch_id, (points, target) in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             optimizer.zero_grad()
             points = points.data.numpy()
-            point_vis = points[0,:,0:3] #For vis
-            points = provider.random_point_dropout(points)
+            # points = provider.random_point_dropout(points)
             points[:, :, 0:3] = provider.random_scale_point_cloud(points[:, :, 0:3])
             points[:, :, 0:3] = provider.shift_point_cloud(points[:, :, 0:3])
             points = torch.Tensor(points)
@@ -254,29 +253,8 @@ def main(args):
             f1_score_per_batch,_,_,_, _ = f1_confusion(predictions,target.float())
             f1_score_train += f1_score_per_batch
             loss_per_epoch += loss.item()
-            #    Ground_truth vis
-            pred_vis = predictions[0,:].data.cpu().numpy().reshape((predictions.shape[1],1))
-            prediction_vis = np.hstack((point_vis,pred_vis))
-
-            #    Ground_truth vis
-            target_vis = target[0,:].data.cpu().numpy().reshape((target.shape[1],1))
-            ground_truth_vis = np.hstack((point_vis,target_vis))
             # --- 
             if args.use_wandb:
-                wandb.log({
-                        "Ground_truth": wandb.Object3D(
-                            {
-                                "type": "lidar/beta",
-                                "points": ground_truth_vis,
-                            }
-                        )})
-                wandb.log({
-                        "Prediction": wandb.Object3D(
-                            {
-                                "type": "lidar/beta",
-                                "points": prediction_vis,
-                            }
-                        )})
                 wandb.log({"loss_per_batch": loss.item()})
                 wandb.log({"f1_score_per_batch": f1_score_per_batch})
         f1_score_train /= len(trainDataLoader)
@@ -287,26 +265,26 @@ def main(args):
 
         log_string('F1_score: %f' % f1_score_train)  
 
-        # with torch.no_grad():
-        #     val_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
-        #     if (val_acc >= best_val_acc):
-        #         best_val_acc = val_acc
-        #         best_epoch = epoch + 1
-        #     if args.use_wandb:
-        #         wandb.log({"Validation/Valid_f1_score_per_epoch": val_acc,"epoch": epoch})
+        with torch.no_grad():
+            val_acc = test(classifier.eval(), valDataLoader, num_class=num_class)
+            if (val_acc >= best_val_acc):
+                best_val_acc = val_acc
+                best_epoch = epoch + 1
+            if args.use_wandb:
+                wandb.log({"Validation/Valid_f1_score_per_epoch": val_acc,"epoch": epoch})
 
-        #     if (val_acc >= best_val_acc):
-        #         logger.info('Save model...')
-        #         savepath = str(checkpoints_dir) + '/best_model.pth'
-        #         log_string('Saving at %s' % savepath)
-        #         state = {
-        #             'epoch': best_epoch,
-        #             'val_acc': val_acc,
-        #             'model_state_dict': classifier.state_dict(),
-        #             'optimizer_state_dict': optimizer.state_dict(),
-        #         }
-        #         torch.save(state, savepath)
-        #     global_epoch += 1
+            if (val_acc >= best_val_acc):
+                logger.info('Save model...')
+                savepath = str(checkpoints_dir) + '/best_model.pth'
+                log_string('Saving at %s' % savepath)
+                state = {
+                    'epoch': best_epoch,
+                    'val_acc': val_acc,
+                    'model_state_dict': classifier.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                }
+                torch.save(state, savepath)
+            global_epoch += 1
 
     logger.info('End of training...')
 
@@ -323,10 +301,10 @@ if __name__ == '__main__':
         decay_rate = args.decay_rate,
         optimizer = str(args.optimizer),
         )
-        run_id = str(uuid.uuid4())
+        run_id = str(uuid.uuid4())[:8]
         computer_name = str(socket.gethostname())
         wandb.init(project="robo-sponge",
-                            name=f'Deform-ContactNet-{computer_name}-{run_id}',
+                            name=f'Deform-ContactNet-{computer_name}-{str(args.model)}-{run_id}',
                             group=f'Deform-ContactNet',
                             config=config)
     main(args)
