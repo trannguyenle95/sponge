@@ -11,12 +11,14 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 sys.path.append(os.path.join(BASE_DIR,'deform_contactnet','models'))
 import numpy_indexed as npi
 from tqdm import tqdm
-
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 MODEL_DIR = '../deform_contactnet/log/classification/deform_contactnet_pointnet'
-RESULTS_STORAGE_TAG = "_all"
 
 def pc_normalize(pc):
+    """
+    This function normalizes the points in point cloud. 
+    """
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid
     m = np.max(np.sqrt(np.sum(pc**2, axis=1)))
@@ -24,6 +26,14 @@ def pc_normalize(pc):
     return pc
 
 def predict_contact(input, use_cpu):
+    """
+    This function predicts the contact patch on target objects given the formatted input (point_xyz, point_normal, feature_vector). 
+    Inputs:
+        input (n_pts,8)
+        use_cpu (bool)
+    Outputs:
+        predictions (n_pts,8): include only 0 (non-contact) and 1 (in-contact)
+    """
     input[:, 0:3] = pc_normalize(input[:, 0:3]) # normalize input pc very important!      
     input = torch.reshape(torch.from_numpy(input), (1, input.shape[0], input.shape[1]))
 
@@ -44,7 +54,14 @@ def predict_contact(input, use_cpu):
 
 
 def pick_a_point(list_of_pts, list_of_normals):
-    """ Returns waypoint_pos (not normalized), waypoint_ori (in degree), formatted_input to network
+    """ This function randomly pick a point in the point cloud.
+    Inputs:
+        list_of_pts (n_pts, 3): list of xyz coordinates of point cloud. 
+        list_of_normals (n_pts, 3): list of normals of point cloud.
+    Outputs:
+        waypoint_pos (1,3): xyz coordinate of chosen point.
+        waypoint_ori (int): gripper orientation in degree
+        formatted_input (n_pts,8): input for deform_contactnet
     """
     feature_vec = np.zeros((list_of_pts.shape[0],2))
     input = np.concatenate((list_of_pts, list_of_normals,feature_vec), axis=1)
@@ -57,7 +74,23 @@ def pick_a_point(list_of_pts, list_of_normals):
     input[randomRows_idx,-2:] = chosen_gipper_ori
     return list_of_pts[randomRows_idx,:], chosen_gipper_ori_degree, input.astype(np.float32)
 
-def sample_waypoints(num_waypoints, list_of_pts, list_of_normals, vis):
+def sample_waypoints(list_of_pts, list_of_normals, vis):
+    """ This function samples a list of waypoints to maximize the coverage area of the target object.
+
+    1. Read the point cloud, randomly pick a point as the initial waypoint and predict the contact patch with the target object.
+    2. Randomly pick another point that is not inside the prev contact patch and predict the new contact patch. 
+    3. If the intersection between new contact patch and the prev one, BIGGER than a threshold -> Abort this point and pick another point. 
+    4. If SMALLER than a threshold -> Save the chosen point (pos+ori) to the list of waypoints.
+    5. Loop 2-4 until we cover all the points in the point cloud.
+    Inputs:
+        list_of_pts (n_pts, 3): list of xyz coordinates of point cloud. 
+        list_of_normals (n_pts, 3): list of normals of point cloud.
+        vis (bool): Visulization of the process.
+    Outputs:
+        waypoints (n_waypoints,3)
+        waypoints_ori (n_waypoints,1)
+    """
+
     waypoints = []
     waypoints_ori = []
     # waypoints_idxs = []
@@ -125,7 +158,7 @@ def main():
     sequences_waypoints = []
     sequences_waypoints_ori = []
     for i in tqdm(range(n_sequences)):
-        waypoints, waypoints_ori = sample_waypoints(10,target_object_points,target_object_normals,vis=False)
+        waypoints, waypoints_ori = sample_waypoints(target_object_points,target_object_normals,vis=False)
         waypoints = np.vstack(waypoints)
         waypoints_ori = np.asarray(waypoints_ori)
         sequences_waypoints.append(waypoints)
@@ -133,7 +166,6 @@ def main():
         
     shortest_sequence_waypoints = min(sequences_waypoints,key=len)
     shortest_sequence_ori = sequences_waypoints_ori[sequences_waypoints.index(shortest_sequence_waypoints)]
-    # print(len(sequences_waypoints), sequences_waypoints[0].shape, len(sequences_waypoints_ori), sequences_waypoints_ori[0].shape)
     for i in sequences_waypoints:
         print(i.shape)
     print(sequences_waypoints.index(shortest_sequence_waypoints),shortest_sequence_waypoints.shape, shortest_sequence_waypoints, shortest_sequence_ori)
@@ -143,7 +175,7 @@ def main():
     print(waypoints_idxs)
     for i in waypoints_idxs:
         print(target_object_points[i,:])
-    # ==========
+    # ========== Visualization of waypoints ==========
     if args.use_vis:
         pts_color = np.zeros((target_object_points.shape[0],3)) 
         for i in waypoints_idxs:
@@ -153,7 +185,7 @@ def main():
         pcd.points = open3d.utility.Vector3dVector(np.array(target_object_points))
         pcd.colors = open3d.utility.Vector3dVector(np.array(pts_color))
         open3d.visualization.draw_geometries([pcd]) 
-    # ============
+    # =================================================
 if __name__ == "__main__":
     main()
 
