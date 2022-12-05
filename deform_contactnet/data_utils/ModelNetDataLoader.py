@@ -107,11 +107,14 @@ if __name__ == '__main__':
     import open3d
     data = ModelNetDataLoader(root='../dataset/', split='train')
     train_dataset, validation_dataset = torch.utils.data.random_split(data,[int(0.8 * len(data)), len(data) - int(0.8 * len(data))], generator=torch.Generator().manual_seed(42))
-    DataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=4, shuffle=True)
+    DataLoader = torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=True)
     for point, label in DataLoader:
         print(point.shape)
         print(label.shape)
+        # point = point.transpose(2, 1) 
+        print(point)
         points = point[0,:,0:3].data.numpy()
+        points = points.transpose(2, 1) 
         pts_color = np.zeros((points.shape[0],3)) 
         test = (label[0]*255).reshape((pts_color.shape[0],))
         pts_color[:,0] = test

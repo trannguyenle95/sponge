@@ -5,3 +5,4 @@ deform_contactnet/wandb/latest-run
 deform_contactnet/log
 backup_dataset
 dataset
+best_checkpoints

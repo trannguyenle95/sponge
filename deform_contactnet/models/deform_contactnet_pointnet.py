@@ -66,7 +66,7 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.utils.data
 import torch.nn.functional as F
-from models.pointnet import PointNetEncoder, feature_transform_reguliarzer
+from pointnet import PointNetEncoder, feature_transform_reguliarzer
 
 
 class get_model(nn.Module):
