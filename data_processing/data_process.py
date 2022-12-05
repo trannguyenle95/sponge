@@ -3,7 +3,6 @@ import numpy as np
 import os
 import shutil
 import math
-# np.set_printoptions(threshold=np.inf)
 import h5py
 import argparse
 import sys
