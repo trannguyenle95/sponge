@@ -252,7 +252,7 @@ def create_scene(gym, sim, object_name, props, assets_sponge, assets_targetobjec
 
         if object_name in ['platform']:
             pose.p = gymapi.Vec3(0.0, sponge_offset, 0.0)
-            gripper_rotation_per_env = np.array([0,0,0])
+            gripper_rotation_per_env = np.array([0,-45,0])
         else:
             pose.p = gymapi.Vec3(sampled_points_approach[0][0], sampled_points_approach[0][1], sampled_points_approach[0][2])
             gripper_rotation_per_env = np.array([sampled_points_normals_euler[0][0],z_angle,sampled_points_normals_euler[0][2]])
