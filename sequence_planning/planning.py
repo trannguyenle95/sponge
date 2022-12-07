@@ -16,7 +16,7 @@ import tsp_2opt
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 MODEL_DIR = '../deform_contactnet/log/classification/deform_contactnet_pointnet'
 
-def write_results(object_name, waypoints, waypoints_ori):
+def write_results(object_name, sorted_waypoints, sorted_waypoints_ori):
     import pickle
     import re
     RESULTS_DIR = "planning_results/"
@@ -36,7 +36,7 @@ def write_results(object_name, waypoints, waypoints_ori):
 
     with open(object_file_name, 'wb') as f:
         # Pickle the 'data' dictionary using the highest protocol available.
-        pickle.dump((waypoints,waypoints_ori), f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump((sorted_waypoints,sorted_waypoints_ori), f, pickle.HIGHEST_PROTOCOL)
     print("Done writing results to ", object_file_name)
 
 def pc_normalize(pc):
@@ -162,7 +162,6 @@ def sample_waypoints(list_of_pts, list_of_normals, vis_seq, vis_seq_count):
 
 def tsp(waypoints,waypoints_ori):
     distances = tsp_2opt.precalculate_distances(waypoints)
-    print(distances)
     num_points = waypoints.shape[0]    
     best_route = tsp_2opt.random_route(num_points)
     path_improved = True
@@ -205,7 +204,7 @@ def main():
     target_object_normals = np.asarray(target_object_pcd.normals)
 
     # Sample n sequence and seek to the one with least waypoints 
-    n_sequences = 1
+    n_sequences = 50
     sequences_waypoints = []
     sequences_waypoints_ori = []
     for i in tqdm(range(n_sequences)):
@@ -215,25 +214,31 @@ def main():
         sequences_waypoints.append(waypoints)
         sequences_waypoints_ori.append(waypoints_ori)
         
-    shortest_sequence_waypoints = min(sequences_waypoints,key=len)
+    shortest_sequence_waypoints = np.asarray(min(sequences_waypoints,key=len))
     shortest_sequence_ori = sequences_waypoints_ori[sequences_waypoints.index(shortest_sequence_waypoints)]
-    if args.write:
-        write_results(object_name,shortest_sequence_waypoints,shortest_sequence_ori)
     for i in sequences_waypoints:
         print(i.shape)
-    print(sequences_waypoints.index(shortest_sequence_waypoints),shortest_sequence_waypoints.shape, shortest_sequence_waypoints, shortest_sequence_ori)
+    # print(sequences_waypoints.index(shortest_sequence_waypoints),shortest_sequence_waypoints.shape, shortest_sequence_waypoints, shortest_sequence_ori)
 
     waypoints_idxs = npi.indices(target_object_points,shortest_sequence_waypoints) #Get index of waypoints respect to point cloud
     best_route = tsp(shortest_sequence_waypoints, shortest_sequence_ori)
-    print(best_route)
-    for i in waypoints_idxs:
-        print(target_object_points[i,:])
+
+    sorted_shortest_sequence_waypoints = shortest_sequence_waypoints[best_route] #sort waypoints based on best route tsp
+    sorted_shortest_sequence_ori = shortest_sequence_ori[best_route]
+    print(shortest_sequence_waypoints)
+    print("==", best_route)
+    print(sorted_shortest_sequence_waypoints)
+    if args.write:
+        write_results(object_name,sorted_shortest_sequence_waypoints,sorted_shortest_sequence_ori)
+    # for i in waypoints_idxs:
+    #     print(target_object_points[i,:])
     # ========== Visualization of waypoints ==========
     if args.use_vis:
         pts_color = np.zeros((target_object_points.shape[0],3)) 
-        pts_color[waypoints_idxs[best_route[0]],1] = 255 #First point in best route coresponded to original pc
+        pts_color[waypoints_idxs[best_route[0]],2] = 255 #First point in best route coresponded to original pc
+
         for i in waypoints_idxs:
-            pts_color[i,0] = 255
+            pts_color[i,0] = 255        
 
         lines = []
         for i in range(len(best_route)-1):
