@@ -208,7 +208,7 @@ def main():
     sequences_waypoints = []
     sequences_waypoints_ori = []
     for i in tqdm(range(n_sequences)):
-        waypoints, waypoints_ori = sample_waypoints(target_object_points,target_object_normals,vis_seq=False,vis_seq_count=i) 
+        waypoints, waypoints_ori = sample_waypoints(target_object_points,target_object_normals,vis_seq=False,vis_seq_count=int(n_sequences-1-i)) 
         waypoints = np.vstack(waypoints)
         waypoints_ori = np.asarray(waypoints_ori)
         sequences_waypoints.append(waypoints)
