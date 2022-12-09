@@ -31,7 +31,7 @@ def write_results(object_name, sorted_waypoints, sorted_waypoints_ori):
         num_seq = max(file_idxes)+1
     else:
         num_seq = 0
-    object_file_name = object_name +  "_seq"+"_"+str(num_seq)+".pickle"
+    object_file_name = object_name +  "_seq"+"_"+str(num_seq)+".pkl"
     object_file_name = os.path.join(RESULTS_DIR, object_name, object_file_name)
 
     with open(object_file_name, 'wb') as f:
@@ -208,7 +208,7 @@ def main():
     sequences_waypoints = []
     sequences_waypoints_ori = []
     for i in tqdm(range(n_sequences)):
-        waypoints, waypoints_ori = sample_waypoints(target_object_points,target_object_normals,vis_seq=False,vis_seq_count=int(n_sequences-1-i)) 
+        waypoints, waypoints_ori = sample_waypoints(target_object_points,target_object_normals,vis_seq=True,vis_seq_count=int(n_sequences-1-i)) 
         waypoints = np.vstack(waypoints)
         waypoints_ori = np.asarray(waypoints_ori)
         sequences_waypoints.append(waypoints)

@@ -2,7 +2,8 @@ import subprocess
 from colorama import Fore, Back, Style
 
 
-objects = ["plate_ycb","bowl_ycb","bowl_shapenet"]
+objects = ["bowl_a_shapenet","bowl_b_shapenet","bowl_c_shapenet","bowl_d_shapenet","bowl_e_shapenet",
+           "bowl_f_shapenet", "plate_a_shapenet"]
 num_iters = 100
 for object_name in objects:
     for i in range(num_iters):
