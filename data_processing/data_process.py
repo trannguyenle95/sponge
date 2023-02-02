@@ -79,7 +79,7 @@ def main():
             contact_label = np.zeros((target_object_pc_pts.shape[0],1))
             for j in range(target_object_pc_pts.shape[0]):
                 dist = cdist(target_object_pc_pts[j].reshape((1,3)),sponge_position_at_force_contacted_points_all[i])
-                if np.any(dist < 0.01):
+                if np.any(dist < 0.02):
                     contact_label[j] = 1.0       
             
             contact_label_all.append(contact_label)

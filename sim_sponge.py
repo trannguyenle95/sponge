@@ -38,7 +38,7 @@ def main():
     parser.register('type', 'boolean', strtobool) #to help deal with problem bool("False")=True
     parser.add_argument('--object', required=True, help="Name of object")
     parser.add_argument('--density', default=1000, type=float, help="Density")
-    parser.add_argument('--youngs', default=10000, type=float, help="Elastic modulus of the sponge [Pa]")
+    parser.add_argument('--youngs', default=2000000000, type=float, help="Elastic modulus of the sponge [Pa]")
     parser.add_argument('--poiss_ratio', default=0.35, type=float, help="Poisson's ratio of sponge") #0.45 good
     parser.add_argument('--extract_stress', default=False, type='boolean', help='Extract stress at each indentation step (will reduce simulation speed)')
     parser.add_argument('--num_envs', default=1, type=int, help='Number of envs')
@@ -137,7 +137,7 @@ def main():
                                 target_object_name=target_name[0],
                                 gripper_ori=gripper_rotation_with_random_z[i],
                                 press_loc=press_loc[i],
-                                press_force=np.array([0.0,5.0,0.0]),
+                                press_force=np.array([0.0,10.0,0.0]), #soft f=5
                                 show_contacts=True)
         elif args.increment_force:
             f_y_desired_envs = np.linspace(1.0,25.0,num=len(env_handles))
